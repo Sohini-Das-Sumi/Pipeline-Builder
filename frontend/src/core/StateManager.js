@@ -100,8 +100,11 @@ export class StateManager {
   }
 
   onConnect(connection) {
+    // Generate a unique edge ID if not provided
+    const edgeId = connection.id || this.getEdgeID();
     const newEdge = {
       ...connection,
+      id: edgeId,
       type: 'smoothstep',
       animated: true,
       markerEnd: { type: MarkerType.Arrow, height: '20px', width: '20px' }

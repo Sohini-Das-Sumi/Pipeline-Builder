@@ -3,7 +3,7 @@
 // --------------------------------------------------
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import ReactFlow, { Controls, Background, MiniMap, ControlButton } from 'reactflow';
+import ReactFlow, { Controls, Background, MiniMap, ControlButton, MarkerType } from 'reactflow';
 import { useStore, setReactFlowInstance as setStoreReactFlowInstance } from './StoreContext.jsx';
 import { InputNode } from './nodes/inputNode.jsx';
 import LLMNode from './nodes/llmNode.jsx';
@@ -53,7 +53,8 @@ export const PipelineUI = () => {
       toggleTheme,
       isInteractive,
       toggleInteractivity,
-      setIsInteractiveState
+      setIsInteractiveState,
+      setEdges
     } = useStore();
     
 
@@ -131,6 +132,38 @@ export const PipelineUI = () => {
         event.dataTransfer.dropEffect = 'move';
     }, []);
 
+    // Custom onConnect handler that uses reactFlowInstance.addEdges() directly
+    // This ensures ReactFlow gets the edge properly
+    const handleConnect = useCallback(async (connection) => {
+        if (!reactFlowInstance) {
+            console.warn('handleConnect: reactFlowInstance not available');
+            return;
+        }
+
+        // Generate a unique edge ID
+        const edgeId = connection.id || `edge-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        
+        const newEdge = {
+            ...connection,
+            id: edgeId,
+            type: 'smoothstep',
+            animated: true,
+            markerEnd: { type: MarkerType.Arrow, height: '20px', width: '20px' }
+        };
+
+        console.log('handleConnect: Adding edge directly to ReactFlow', newEdge);
+        
+        // Add edge directly to ReactFlow's internal state
+        reactFlowInstance.addEdges([newEdge]);
+        
+        // Also call the store's onConnect to keep StateManager in sync
+        if (onConnect) {
+            await onConnect(connection);
+        }
+        
+        console.log('handleConnect: Edge added successfully');
+    }, [reactFlowInstance, onConnect]);
+
     return (
         <>
         <div ref={reactFlowWrapper} style={{position: 'absolute', top: '5px', left: '5px', right: '5px', bottom: '125px'}}>
@@ -139,7 +172,7 @@ export const PipelineUI = () => {
                 edges={edges}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
-                onConnect={onConnect}
+                onConnect={handleConnect}
                 onDrop={onDrop}
                 onDragOver={onDragOver}
                 onInit={(instance) => {

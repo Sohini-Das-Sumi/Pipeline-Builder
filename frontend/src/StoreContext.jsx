@@ -307,14 +307,20 @@ export const StoreProvider = ({ children }) => {
   }, [edges, schedulePersist]);
 
   const onConnect = useCallback(async (connection) => {
+    // Generate a unique edge ID if not provided
+    const edgeId = connection.id || getStateManager().getEdgeID();
     const newEdge = {
       ...connection,
+      id: edgeId,
       type: 'smoothstep',
       animated: true,
       markerEnd: { type: MarkerType.Arrow, height: '20px', width: '20px' }
     };
+    console.log('onConnect: Adding edge', newEdge);
     getStateManager().addEdge(newEdge);
-    setEdges(getStateManager().getEdges());
+    const updatedEdges = getStateManager().getEdges();
+    console.log('onConnect: Updated edges count:', updatedEdges.length);
+    setEdges(updatedEdges);
     schedulePersist();
   }, [schedulePersist]);
 
