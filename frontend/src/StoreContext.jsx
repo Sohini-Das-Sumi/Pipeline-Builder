@@ -52,6 +52,9 @@ export const StoreProvider = ({ children }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [theme, setTheme] = useState('dark');
   const [isInteractive, setIsInteractive] = useState(true);
+  const [zoomOnScroll, setZoomOnScroll] = useState(true);
+  const [zoomOnPinch, setZoomOnPinch] = useState(true);
+  const [zoomOnDoubleClick, setZoomOnDoubleClick] = useState(true);
   const [persistenceTimeout, setPersistenceTimeout] = useState(null);
   const [onSelectionChangeCallback, setOnSelectionChangeCallback] = useState(null);
   const [isUpdatingSelection, setIsUpdatingSelection] = useState(false);
@@ -258,6 +261,20 @@ export const StoreProvider = ({ children }) => {
   const toggleInteractivity = useCallback(async () => {
     setIsInteractive(!isInteractive);
   }, [isInteractive]);
+
+  const toggleZoomOnScroll = useCallback(() => {
+    setZoomOnScroll(prev => !prev);
+  }, []);
+
+  const toggleZoomOnPinch = useCallback(() => {
+    setZoomOnPinch(prev => !prev);
+  }, []);
+
+  const toggleZoomOnDoubleClick = useCallback(() => {
+    setZoomOnDoubleClick(prev => !prev);
+  }, []);
+
+  
 
   
 
@@ -668,6 +685,9 @@ export const StoreProvider = ({ children }) => {
     isLoaded,
     theme,
     isInteractive,
+    zoomOnScroll,
+    zoomOnPinch,
+    zoomOnDoubleClick,
     onSelectionChangeCallback,
     isUpdatingSelection,
     loadState,
@@ -676,6 +696,9 @@ export const StoreProvider = ({ children }) => {
     toggleBackground,
     toggleTheme,
     toggleInteractivity,
+    toggleZoomOnScroll,
+    toggleZoomOnPinch,
+    toggleZoomOnDoubleClick,
     onNodesChange,
     onEdgesChange,
     onConnect,

@@ -20,20 +20,24 @@ const ThreeBackground = ({ theme = 'dark' }) => {
     if (rendererRef.current) {
       rendererRef.current.setClearColor(theme === 'dark' ? 0x000000 : 0xffffff, 0);
     }
-    // Update wave colors based on theme
-    if (waveMeshesRef.current && sceneRef.current) {
-      waveMeshesRef.current.forEach((waveMesh) => {
+    // Update wave colors based on theme - with emissive glow
+    const darkThemeColors = [0x8a2be2, 0x8a2be2, 0x8a2be2, 0x8a2be2]; // Neon violet for dark theme (4 colors for 4 waves)
+    const lightThemeColors = [0xFF1493, 0xFF1493, 0xFF1493, 0xFF1493]; // Neon pink for light theme (4 colors for 4 waves)
+    const colors = theme === 'dark' ? darkThemeColors : lightThemeColors;
+    
+    if (waveMeshesRef.current && sceneRef.current && waveMeshesRef.current.length > 0) {
+      waveMeshesRef.current.forEach((waveMesh, index) => {
+        // Skip if waveMesh or material is undefined
+        if (!waveMesh || !waveMesh.material) return;
+        
         const waveMaterial = waveMesh.material;
-        if (waveMaterial) {
-          if (theme === 'dark') {
-            waveMaterial.color.setHex(0x8a2be2); // Neon violet
-            waveMaterial.emissive.setHex(0x8a2be2);
-            waveMaterial.opacity = 0.3; // More transparent
-          } else {
-            // Light theme - Neon pink waves
-            waveMaterial.color.setHex(0xFF1493); // Neon pink
-            waveMaterial.emissive.setHex(0xFF1493); // Neon pink glow
-            waveMaterial.opacity = 0.4; // Visible on white
+        const colorIndex = index; // Direct index for the 4 colors
+        
+        if (colors[colorIndex]) {
+          waveMaterial.color.setHex(colors[colorIndex]);
+          // Only set emissive if the material has emissive property (MeshStandardMaterial)
+          if (waveMaterial.emissive) {
+            waveMaterial.emissive.setHex(colors[colorIndex]);
           }
           waveMaterial.needsUpdate = true;
         }
@@ -46,7 +50,19 @@ const ThreeBackground = ({ theme = 'dark' }) => {
     const scene = new THREE.Scene();
     sceneRef.current = scene;
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
+    const renderer = new THREE.WebGLRenderer({ 
+      alpha: true, 
+      antialias: false,
+      depth: false,
+      stencil: false,
+      powerPreference: 'high-performance',
+      preserveDrawingBuffer: false,
+      xr: false,
+      failIfMajorPerformanceCaveat: false
+    });
+    
+    // Limit pixel ratio to prevent texture allocation issues
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 
     const width = mountRef.current.clientWidth;
     const height = mountRef.current.clientHeight;
@@ -68,198 +84,172 @@ const ThreeBackground = ({ theme = 'dark' }) => {
     renderer.domElement.style.background = 'transparent';
     mountRef.current.appendChild(renderer.domElement);
 
-    // Create multiple wave-like backgrounds for ocean effect with enhanced gradient and realism
+    // CLEAN & PROFESSIONAL: Simplified wave animation with vibrant neon colors and glow
     const waveMeshes = [];
-    const numWaves = 12;
-    // Define wave parameters with multiple harmonics for highly realistic ocean effect
+    const numWaves = 4; // Increased from 2 to 4 for more curly layers
+    
+    // Curly wave parameters - MUCH MORE CURLY with 12 harmonics per wave, higher frequencies
     const waveParams = [
-      // Layer 0: Long swell waves
+      // Layer 0: Main curly wave - 12 harmonics for very curly effect
       [
-        { dir: new THREE.Vector2(1, 0.1), amplitude: 3.0, frequency: 0.02, speed: 0.8 },
-        { dir: new THREE.Vector2(0.9, 0.2), amplitude: 1.5, frequency: 0.04, speed: 1.0 },
-        { dir: new THREE.Vector2(0.8, -0.1), amplitude: 1.0, frequency: 0.06, speed: 1.2 },
-        { dir: new THREE.Vector2(0.7, 0.3), amplitude: 0.8, frequency: 0.08, speed: 0.9 }
+        { dir: new THREE.Vector2(1, 0), amplitude: 3.0, frequency: 0.03, speed: 0.4 },
+        { dir: new THREE.Vector2(0.95, 0.05), amplitude: 2.8, frequency: 0.04, speed: 0.45 },
+        { dir: new THREE.Vector2(0.85, 0.15), amplitude: 2.5, frequency: 0.055, speed: 0.5 },
+        { dir: new THREE.Vector2(0.75, 0.25), amplitude: 2.2, frequency: 0.07, speed: 0.55 },
+        { dir: new THREE.Vector2(0.65, 0.35), amplitude: 2.0, frequency: 0.085, speed: 0.6 },
+        { dir: new THREE.Vector2(0.55, 0.45), amplitude: 1.7, frequency: 0.1, speed: 0.65 },
+        { dir: new THREE.Vector2(0.45, 0.55), amplitude: 1.5, frequency: 0.115, speed: 0.7 },
+        { dir: new THREE.Vector2(0.35, 0.65), amplitude: 1.2, frequency: 0.13, speed: 0.75 },
+        { dir: new THREE.Vector2(0.25, 0.75), amplitude: 1.0, frequency: 0.145, speed: 0.8 },
+        { dir: new THREE.Vector2(0.15, 0.85), amplitude: 0.7, frequency: 0.16, speed: 0.85 },
+        { dir: new THREE.Vector2(0.05, 0.95), amplitude: 0.4, frequency: 0.175, speed: 0.9 },
+        { dir: new THREE.Vector2(-0.05, 1), amplitude: 0.2, frequency: 0.19, speed: 0.95 }
       ],
-      // Layer 1: Medium waves
+      // Layer 1: Secondary curly wave - offset for more curl (12 harmonics)
       [
-        { dir: new THREE.Vector2(0.8, 0.2), amplitude: 2.5, frequency: 0.03, speed: 1.1 },
-        { dir: new THREE.Vector2(0.6, 0.4), amplitude: 1.2, frequency: 0.05, speed: 0.9 },
-        { dir: new THREE.Vector2(0.5, -0.2), amplitude: 0.9, frequency: 0.07, speed: 1.3 },
-        { dir: new THREE.Vector2(0.4, 0.5), amplitude: 0.7, frequency: 0.09, speed: 1.0 }
+        { dir: new THREE.Vector2(0.95, 0.05), amplitude: 2.8, frequency: 0.035, speed: 0.38 },
+        { dir: new THREE.Vector2(0.9, 0.1), amplitude: 2.6, frequency: 0.045, speed: 0.43 },
+        { dir: new THREE.Vector2(0.8, 0.2), amplitude: 2.3, frequency: 0.06, speed: 0.48 },
+        { dir: new THREE.Vector2(0.7, 0.3), amplitude: 2.0, frequency: 0.075, speed: 0.53 },
+        { dir: new THREE.Vector2(0.6, 0.4), amplitude: 1.8, frequency: 0.09, speed: 0.58 },
+        { dir: new THREE.Vector2(0.5, 0.5), amplitude: 1.5, frequency: 0.105, speed: 0.63 },
+        { dir: new THREE.Vector2(0.4, 0.6), amplitude: 1.3, frequency: 0.12, speed: 0.68 },
+        { dir: new THREE.Vector2(0.3, 0.7), amplitude: 1.1, frequency: 0.135, speed: 0.73 },
+        { dir: new THREE.Vector2(0.2, 0.8), amplitude: 0.9, frequency: 0.15, speed: 0.78 },
+        { dir: new THREE.Vector2(0.1, 0.9), amplitude: 0.6, frequency: 0.165, speed: 0.83 },
+        { dir: new THREE.Vector2(0, 1), amplitude: 0.35, frequency: 0.18, speed: 0.88 },
+        { dir: new THREE.Vector2(-0.1, 0.98), amplitude: 0.18, frequency: 0.195, speed: 0.93 }
       ],
-      // Layer 2: Shorter choppy waves
+      // Layer 2: Third curly wave - more cross-directional for extra curl (12 harmonics)
       [
-        { dir: new THREE.Vector2(0.6, 0.4), amplitude: 2.0, frequency: 0.04, speed: 1.2 },
-        { dir: new THREE.Vector2(0.4, 0.6), amplitude: 1.0, frequency: 0.06, speed: 0.8 },
-        { dir: new THREE.Vector2(0.3, -0.3), amplitude: 0.8, frequency: 0.08, speed: 1.4 },
-        { dir: new THREE.Vector2(0.2, 0.7), amplitude: 0.6, frequency: 0.1, speed: 1.1 }
+        { dir: new THREE.Vector2(0.9, 0.1), amplitude: 2.5, frequency: 0.038, speed: 0.42 },
+        { dir: new THREE.Vector2(0.82, 0.18), amplitude: 2.3, frequency: 0.05, speed: 0.47 },
+        { dir: new THREE.Vector2(0.72, 0.28), amplitude: 2.0, frequency: 0.065, speed: 0.52 },
+        { dir: new THREE.Vector2(0.62, 0.38), amplitude: 1.7, frequency: 0.08, speed: 0.57 },
+        { dir: new THREE.Vector2(0.52, 0.48), amplitude: 1.5, frequency: 0.095, speed: 0.62 },
+        { dir: new THREE.Vector2(0.42, 0.58), amplitude: 1.3, frequency: 0.11, speed: 0.67 },
+        { dir: new THREE.Vector2(0.32, 0.68), amplitude: 1.1, frequency: 0.125, speed: 0.72 },
+        { dir: new THREE.Vector2(0.22, 0.78), amplitude: 0.9, frequency: 0.14, speed: 0.77 },
+        { dir: new THREE.Vector2(0.12, 0.88), amplitude: 0.7, frequency: 0.155, speed: 0.82 },
+        { dir: new THREE.Vector2(0.02, 0.95), amplitude: 0.5, frequency: 0.17, speed: 0.87 },
+        { dir: new THREE.Vector2(-0.08, 0.97), amplitude: 0.3, frequency: 0.185, speed: 0.92 },
+        { dir: new THREE.Vector2(-0.15, 0.95), amplitude: 0.15, frequency: 0.2, speed: 0.97 }
       ],
-      // Layer 3: Wind waves
+      // Layer 3: Fourth curly wave - highest frequencies for tightest curls (12 harmonics)
       [
-        { dir: new THREE.Vector2(0.4, 0.6), amplitude: 1.8, frequency: 0.05, speed: 1.3 },
-        { dir: new THREE.Vector2(0.2, 0.8), amplitude: 0.9, frequency: 0.07, speed: 0.9 },
-        { dir: new THREE.Vector2(0.1, -0.4), amplitude: 0.7, frequency: 0.09, speed: 1.5 },
-        { dir: new THREE.Vector2(0, 0.9), amplitude: 0.5, frequency: 0.11, speed: 1.2 }
-      ],
-      // Layer 4: Ripple effects
-      [
-        { dir: new THREE.Vector2(0.2, 0.8), amplitude: 1.5, frequency: 0.06, speed: 1.4 },
-        { dir: new THREE.Vector2(0, 1), amplitude: 0.8, frequency: 0.08, speed: 1.0 },
-        { dir: new THREE.Vector2(-0.1, 0.8), amplitude: 0.6, frequency: 0.1, speed: 1.6 },
-        { dir: new THREE.Vector2(-0.2, 0.6), amplitude: 0.4, frequency: 0.12, speed: 1.3 }
-      ],
-      // Layer 5: Cross-waves
-      [
-        { dir: new THREE.Vector2(0, 1), amplitude: 1.3, frequency: 0.07, speed: 1.5 },
-        { dir: new THREE.Vector2(-0.2, 0.8), amplitude: 0.7, frequency: 0.09, speed: 1.1 },
-        { dir: new THREE.Vector2(-0.4, 0.6), amplitude: 0.5, frequency: 0.11, speed: 1.7 },
-        { dir: new THREE.Vector2(-0.6, 0.4), amplitude: 0.3, frequency: 0.13, speed: 1.4 }
-      ],
-      // Layer 6: Secondary swells
-      [
-        { dir: new THREE.Vector2(-0.2, 0.8), amplitude: 1.2, frequency: 0.08, speed: 1.6 },
-        { dir: new THREE.Vector2(-0.4, 0.6), amplitude: 0.6, frequency: 0.1, speed: 1.2 },
-        { dir: new THREE.Vector2(-0.6, 0.2), amplitude: 0.4, frequency: 0.12, speed: 1.8 },
-        { dir: new THREE.Vector2(-0.8, 0), amplitude: 0.2, frequency: 0.14, speed: 1.5 }
-      ],
-      // Layer 7: Fine chop
-      [
-        { dir: new THREE.Vector2(-0.4, 0.6), amplitude: 1.0, frequency: 0.09, speed: 1.7 },
-        { dir: new THREE.Vector2(-0.6, 0.2), amplitude: 0.5, frequency: 0.11, speed: 1.3 },
-        { dir: new THREE.Vector2(-0.8, -0.2), amplitude: 0.3, frequency: 0.13, speed: 1.9 },
-        { dir: new THREE.Vector2(-1, 0), amplitude: 0.1, frequency: 0.15, speed: 1.6 }
-      ],
-      // Layer 8: Turbulent waves
-      [
-        { dir: new THREE.Vector2(0.9, -0.1), amplitude: 2.2, frequency: 0.03, speed: 0.7 },
-        { dir: new THREE.Vector2(0.7, -0.3), amplitude: 1.1, frequency: 0.05, speed: 1.1 },
-        { dir: new THREE.Vector2(0.5, -0.5), amplitude: 0.8, frequency: 0.07, speed: 1.5 },
-        { dir: new THREE.Vector2(0.3, -0.7), amplitude: 0.6, frequency: 0.09, speed: 1.0 }
-      ],
-      // Layer 9: Diagonal swells
-      [
-        { dir: new THREE.Vector2(0.5, -0.5), amplitude: 1.8, frequency: 0.04, speed: 1.2 },
-        { dir: new THREE.Vector2(0.3, -0.7), amplitude: 0.9, frequency: 0.06, speed: 0.8 },
-        { dir: new THREE.Vector2(0.1, -0.9), amplitude: 0.7, frequency: 0.08, speed: 1.4 },
-        { dir: new THREE.Vector2(-0.1, -0.8), amplitude: 0.5, frequency: 0.1, speed: 1.1 }
-      ],
-      // Layer 10: Reverse flow
-      [
-        { dir: new THREE.Vector2(-0.6, 0.2), amplitude: 1.6, frequency: 0.05, speed: 1.3 },
-        { dir: new THREE.Vector2(-0.8, -0.2), amplitude: 0.8, frequency: 0.07, speed: 0.9 },
-        { dir: new THREE.Vector2(-1, 0), amplitude: 0.6, frequency: 0.09, speed: 1.5 },
-        { dir: new THREE.Vector2(-0.9, 0.1), amplitude: 0.4, frequency: 0.11, speed: 1.2 }
-      ],
-      // Layer 11: Complex interference
-      [
-        { dir: new THREE.Vector2(-0.8, -0.2), amplitude: 1.4, frequency: 0.06, speed: 1.4 },
-        { dir: new THREE.Vector2(-0.6, -0.4), amplitude: 0.7, frequency: 0.08, speed: 1.0 },
-        { dir: new THREE.Vector2(-0.4, -0.6), amplitude: 0.5, frequency: 0.1, speed: 1.6 },
-        { dir: new THREE.Vector2(-0.2, -0.8), amplitude: 0.3, frequency: 0.12, speed: 1.3 }
+        { dir: new THREE.Vector2(0.88, 0.12), amplitude: 2.2, frequency: 0.042, speed: 0.36 },
+        { dir: new THREE.Vector2(0.78, 0.22), amplitude: 2.0, frequency: 0.055, speed: 0.41 },
+        { dir: new THREE.Vector2(0.68, 0.32), amplitude: 1.8, frequency: 0.07, speed: 0.46 },
+        { dir: new THREE.Vector2(0.58, 0.42), amplitude: 1.5, frequency: 0.085, speed: 0.51 },
+        { dir: new THREE.Vector2(0.48, 0.52), amplitude: 1.3, frequency: 0.1, speed: 0.56 },
+        { dir: new THREE.Vector2(0.38, 0.62), amplitude: 1.1, frequency: 0.115, speed: 0.61 },
+        { dir: new THREE.Vector2(0.28, 0.72), amplitude: 0.9, frequency: 0.13, speed: 0.66 },
+        { dir: new THREE.Vector2(0.18, 0.82), amplitude: 0.7, frequency: 0.145, speed: 0.71 },
+        { dir: new THREE.Vector2(0.08, 0.92), amplitude: 0.5, frequency: 0.16, speed: 0.76 },
+        { dir: new THREE.Vector2(-0.02, 0.98), amplitude: 0.35, frequency: 0.175, speed: 0.81 },
+        { dir: new THREE.Vector2(-0.12, 0.96), amplitude: 0.2, frequency: 0.19, speed: 0.86 },
+        { dir: new THREE.Vector2(-0.2, 0.93), amplitude: 0.1, frequency: 0.205, speed: 0.91 }
       ]
     ];
+    
+    // Original vibrant neon colors with glow - 4 variations for 4 waves
+    const darkThemeColors = [0x8a2be2, 0x9b4dca, 0x7a1fb2, 0x6a1fa2]; // Neon violet variations for dark theme
+    const lightThemeColors = [0xFF1493, 0xFF69B4, 0xFF85C1, 0xE91E63]; // Neon pink variations for light theme
+    
     for (let i = 0; i < numWaves; i++) {
-      const waveGeometry = new THREE.PlaneGeometry(120, 120, 250, 250); // Even larger for more detail
-      // Add color attribute for gradient
-      const colors = [];
-      const positions = waveGeometry.attributes.position.array;
-      for (let j = 0; j < positions.length; j += 3) {
-        const x = positions[j];
-        const y = positions[j + 1];
-        const distance = Math.sqrt(x * x + y * y) / 50; // Softer normalization for more prominent gradient coverage
-        const colorFactor = Math.max(0, 1 - distance * 1.2); // Softer gradient falloff for better visibility
-        const r = colorFactor * 2.8 + (1 - colorFactor) * 0.0; // Vibrant purple like React's front page
-        const g = colorFactor * 0.3 + (1 - colorFactor) * 0.0; // Minimal green for true purple
-        const b = colorFactor * 3.5 + (1 - colorFactor) * 0.0;
-        colors.push(r, g, b);
-      }
-      waveGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+      // 3D BoxGeometry for volumetric waves
+      //const waveGeometry = new THREE.BoxGeometry(100, 100, 10, 48, 48, 4);
+      const waveGeometry = new THREE.PlaneGeometry(100, 100, 48, 48);
+
+      
+      // Use MeshStandardMaterial with emissive for glow effect
       const waveMaterial = new THREE.MeshStandardMaterial({
-        color: 0xffffff, // Base color for vertex colors
-        vertexColors: true,
-        transparent: true, // Enable transparency for layered effect
-        opacity: 0.8 - i * 0.05, // Further increased opacity for more prominence: 0.8 to 0.15
+        color: theme === 'dark' ? darkThemeColors[i] : lightThemeColors[i],
+        emissive: theme === 'dark' ? darkThemeColors[i] : lightThemeColors[i],
+        emissiveIntensity: 0.5, // Glow intensity
+        transparent: true,
+        opacity: 0.4 - i * 0.1, // Moderate opacity for visibility with glow
         side: THREE.DoubleSide,
-        emissive: new THREE.Color(0x2a0055), // Enhanced emissive for more vibrant glow
-        emissiveIntensity: 0.8
       });
+      
       const waveMesh = new THREE.Mesh(waveGeometry, waveMaterial);
-      waveMesh.rotation.x = -Math.PI / 2; // Lay flat
-      waveMesh.position.z = -i * 0.4; // In front of camera for visibility
-      waveMesh.position.x = (i - numWaves / 2) * 3; // Adjusted offset
+      waveMesh.rotation.x = -Math.PI / 2;
+      waveMesh.position.z = -i * 0.3;
+      waveMesh.position.x = (i - numWaves / 2) * 3;
       scene.add(waveMesh);
       waveMeshes.push(waveMesh);
     }
     waveMeshesRef.current = waveMeshes;
 
-    // Add lighting for MeshStandardMaterial - darker theme
-    const ambientLight = new THREE.AmbientLight(0x222222, 0.1); // Much darker ambient light
+    // Lighting for MeshStandardMaterial
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
     scene.add(ambientLight);
-    const directionalLight = new THREE.DirectionalLight(0x444444, 0.3); // Darker directional light
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
     directionalLight.position.set(10, 10, 5);
     scene.add(directionalLight);
 
-    camera.position.z = 3;
+    camera.position.z = 5;
 
-    // Animation loop for wave movement
+    // CLEAN ANIMATION: Slow, subtle wave movement
     let time = 0;
-    const flowDirection = new THREE.Vector2(1, 0.2); // Flow from left to right with slight upward bias
-    const flowSpeed = 4.0; // Much faster speed of the flow
+    let lastGeometryUpdate = 0;
+    const GEOMETRY_UPDATE_INTERVAL = 50; // Slower updates for smoother, less jittery animation
+    const flowDirection = new THREE.Vector2(1, 0); // Simple horizontal flow for 3D waves
+    const flowSpeed = 0.8; // Slower for professional, subtle movement
+    
     const animate = () => {
       requestAnimationFrame(animate);
-      time += 0.08; // Much faster time increment for rapid animation
+      const now = performance.now();
+      time += 0.02; // Slower time increment
 
-      // Calculate flow offset for directional movement
+      // Calculate flow offset
       const flowOffset = flowDirection.clone().multiplyScalar(flowSpeed * time);
 
-      // Animate each wave with Gerstner-like realistic ocean movement and directional flow
-      waveMeshes.forEach((waveMesh, index) => {
-        const positions = waveMesh.geometry.attributes.position.array;
-        const harmonics = waveParams[index];
-        const phaseOffset = index * 0.5;
-        for (let i = 0; i < positions.length; i += 3) {
-          const x = positions[i];
-          const y = positions[i + 1];
-          // Adjust position for flow
-          const flowX = x - flowOffset.x;
-          const flowY = y - flowOffset.y;
-          // Sum contributions from all harmonics in this layer
-          let totalWaveHeight = 0;
-          harmonics.forEach((params, harmonicIndex) => {
-            const dotProduct = params.dir.x * flowX + params.dir.y * flowY;
-            const harmonicPhase = phaseOffset + harmonicIndex * 0.3;
-            const waveHeight = params.amplitude * Math.sin(dotProduct * params.frequency + time * params.speed + harmonicPhase);
-            totalWaveHeight += waveHeight;
-          });
-          // Add some vertical variation for more realism
-          const verticalWave = 0.3 * Math.sin(totalWaveHeight * 0.02 + time * 0.5 + phaseOffset) * Math.cos(flowY * 0.03 + time * 0.3 + phaseOffset);
-          positions[i + 2] = totalWaveHeight + verticalWave;
-        }
-        waveMesh.geometry.attributes.position.needsUpdate = true;
-      });
+      // Update geometry at reduced framerate
+      if (now - lastGeometryUpdate > GEOMETRY_UPDATE_INTERVAL) {
+        lastGeometryUpdate = now;
+        
+        // Animate waves with simplified, gentle calculations
+        waveMeshes.forEach((waveMesh, index) => {
+          const positions = waveMesh.geometry.attributes.position.array;
+          const harmonics = waveParams[index];
+          const phaseOffset = index * Math.PI / 4;
+          
+          for (let i = 0; i < positions.length; i += 3) {
+            const x = positions[i];
+            const y = positions[i + 1];
+            
+            // Simple, clean wave calculation
+            const flowX = x - flowOffset.x;
+            const flowY = y - flowOffset.y;
+            
+            let totalWaveHeight = 0;
+            harmonics.forEach((params) => {
+              const dotProduct = params.dir.x * flowX + params.dir.y * flowY;
+              totalWaveHeight += params.amplitude * Math.sin(dotProduct * params.frequency + time * params.speed + phaseOffset);
+            });
+            
+            positions[i + 2] = totalWaveHeight;
+          }
+          waveMesh.geometry.attributes.position.needsUpdate = true;
+        });
+      }
 
       renderer.render(scene, camera);
     };
     animate();
 
-    // GSAP animations for waves
-    waveMeshes.forEach((waveMesh, index) => {
-      gsap.to(waveMesh.rotation, {
-        z: Math.PI * 2,
-        duration: 120 + index * 20, // Different rotation speeds
-        repeat: -1,
-        ease: 'none',
-      });
-    });
-
-    // Animate camera
-    gsap.to(camera.position, {
-      z: 15,
-      duration: 15,
-      yoyo: true,
-      repeat: -1,
-      ease: 'power1.inOut',
-    });
+    // REMOVED: GSAP rotation animations - they added unnecessary movement
+    // REMOVED: Camera animation - keeping it static for cleaner look
+    
+    // Optional: Very subtle camera breathing (only if needed)
+    // gsap.to(camera.position, {
+    //   z: 5.5,
+    //   duration: 8,
+    //   yoyo: true,
+    //   repeat: -1,
+    //   ease: 'sine.inOut',
+    // });
 
     // Handle resize with debouncing to prevent ResizeObserver loop
     let resizeTimeout;
