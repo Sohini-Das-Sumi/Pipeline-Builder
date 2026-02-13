@@ -104,7 +104,42 @@ export class Pipeline {
               const key = edge.targetHandle || edge.targetHandle === null ? edge.targetHandle : (edge.target || 'inputData');
               // If handle is falsy, default to 'inputData'
               const inputKey = key || 'inputData';
+              
+              // Set the value for the specific handle-based key (e.g., 'value')
               inputs[inputKey] = srcVal;
+              
+              // ALSO set common fallback keys for all node types
+              // This ensures nodes that expect specific input keys can receive data
+              // regardless of which handle is used on the connection
+              
+              // For OutputNode, FilterNode
+              if (inputKey !== 'inputData') {
+                inputs['inputData'] = srcVal;
+              }
+              // For OutputNode
+              if (inputKey !== 'outputValue') {
+                inputs['outputValue'] = srcVal;
+              }
+              // For LLMNode (userPrompt)
+              if (inputKey !== 'userPrompt') {
+                inputs['userPrompt'] = srcVal;
+              }
+              // For LLMNode (systemPrompt)
+              if (inputKey !== 'systemPrompt') {
+                inputs['systemPrompt'] = srcVal;
+              }
+              // For ImageNode
+              if (inputKey !== 'imageUrl') {
+                inputs['imageUrl'] = srcVal;
+              }
+              // For CalculatorNode (input-0)
+              if (inputKey !== 'input-0') {
+                inputs['input-0'] = srcVal;
+              }
+              // For CalculatorNode (input-1)
+              if (inputKey !== 'input-1') {
+                inputs['input-1'] = srcVal;
+              }
             }
           } else {
             // No incoming edges - provide top-level inputValue under common keys
