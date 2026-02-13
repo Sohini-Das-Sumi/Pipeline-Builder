@@ -85,8 +85,9 @@ export const PipelineUI = () => {
     // Load persisted state on component mount
     useEffect(() => {
       loadState();
-      console.log('PipelineUI mounted - state loaded from localStorage');
     }, []); // Empty dependency array to prevent infinite re-renders
+
+
 
     // Apply theme class to body
     useEffect(() => {

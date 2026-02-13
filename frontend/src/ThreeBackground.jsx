@@ -9,13 +9,11 @@ const ThreeBackground = ({ theme = 'dark' }) => {
   const particleGeometryRef = useRef(null);
   const waveMeshesRef = useRef([]);
   const sceneRef = useRef(null);
-  const hasExplodedRef = useRef(false);
-  const setHasExploded = useStore((state) => state.setHasExploded);
   const backgroundVisible = useStore((state) => state.backgroundVisible ?? true);
+
 
   // Effect to update theme
   useEffect(() => {
-    console.log('ThreeBackground theme effect running, theme:', theme);
     // Update renderer clear color for background
     if (rendererRef.current) {
       rendererRef.current.setClearColor(theme === 'dark' ? 0x000000 : 0xffffff, 0);
@@ -238,18 +236,6 @@ const ThreeBackground = ({ theme = 'dark' }) => {
       renderer.render(scene, camera);
     };
     animate();
-
-    // REMOVED: GSAP rotation animations - they added unnecessary movement
-    // REMOVED: Camera animation - keeping it static for cleaner look
-    
-    // Optional: Very subtle camera breathing (only if needed)
-    // gsap.to(camera.position, {
-    //   z: 5.5,
-    //   duration: 8,
-    //   yoyo: true,
-    //   repeat: -1,
-    //   ease: 'sine.inOut',
-    // });
 
     // Handle resize with debouncing to prevent ResizeObserver loop
     let resizeTimeout;

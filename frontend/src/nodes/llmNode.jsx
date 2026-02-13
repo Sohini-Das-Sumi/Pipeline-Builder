@@ -1,6 +1,7 @@
 // llmNode.js
 
 import React, { useEffect, useCallback, useRef, useState } from 'react';
+
 import { Position } from 'reactflow';
 import { BaseNode } from './BaseNode';
 import { useStore } from '../store';
@@ -11,8 +12,8 @@ export default function LLMNode({ id, data, selected }) {
   const selectNode = useStore((state) => state.selectNode);
   const deselectAllNodes = useStore((state) => state.deselectAllNodes);
   const selectedNodesStore = useStore((state) => state.selectedNodes);
-  const loadState = useStore((state) => state.loadState);
   const isSelected = selected || (selectedNodesStore || []).includes(id);
+
   const isDisplayOpen = data?.isDisplayOpen || false;
 
   const textareaRef = useRef(null);
@@ -29,8 +30,8 @@ export default function LLMNode({ id, data, selected }) {
 
   // Force re-render when output changes to ensure it displays
   useEffect(() => {
-    console.log('LLMNode output updated:', output);
   }, [output]);
+
 
   const handleSystemPromptChange = (e) => {
     const newValue = e.target.value;

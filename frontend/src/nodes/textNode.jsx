@@ -37,8 +37,6 @@ export const TextNode = ({ id, data, selected }) => {
     boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
   };
 
-
-
   const handles = [
     { type: 'target', id: 'input' },
     { type: 'source', id: 'output' },
@@ -56,7 +54,6 @@ export const TextNode = ({ id, data, selected }) => {
       isDisplayOpen={isDisplayOpen}
       updateNodeField={updateNodeField}
       nodeKey={`${id}-${isDisplayOpen}`}
-
     >
       {isDisplayOpen ? (
         <div className="space-y-3 p-3 max-w-xl min-h-[300px]">

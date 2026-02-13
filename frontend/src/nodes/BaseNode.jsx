@@ -54,9 +54,8 @@ export const BaseNode = ({ id, title, handles, typeColor, onClick, onClose, extr
           height: '150px'
         })
       }}
-      onMouseEnter={() => {
-        if (isDisplayOpen) console.log('BaseNode render open', id, 'displayWidth=', data?.displayWidth, 'displayHeight=', data?.displayHeight);
-      }}
+      onMouseEnter={() => {}}
+
       onClick={handleNodeClick}
       onTransitionEnd={(e) => {
         // Only trigger onTransitionEnd for transform transitions
@@ -70,7 +69,7 @@ export const BaseNode = ({ id, title, handles, typeColor, onClick, onClose, extr
       {/* Colorful Accent Bar at the top */}
       <div className={`h-1.5 w-full ${typeColor || 'bg-indigo-500'}`} />
 
-      {/* Header */}
+
       <div
         className="px-4 py-2 flex items-center justify-between border-b"
         style={{
@@ -105,10 +104,9 @@ export const BaseNode = ({ id, title, handles, typeColor, onClick, onClose, extr
         </div>
       </div>
 
-      {/* Content */}
       {children}
 
-      {/* Handles */}
+
       {handles.map((h, idx) => (
         <div key={`${id}-${h.id}-wrapper`} className="relative">
           <Handle

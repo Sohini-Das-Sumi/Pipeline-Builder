@@ -1,14 +1,14 @@
-import { useRef, useEffect } from 'react';
+import { useEffect } from 'react';
+
 import { Position } from 'reactflow';
 import { BaseNode } from './BaseNode';
-import { useStore } from '../store';
 
 export const OutputNode = ({ id, data, selected }) => {
   const updateNodeField = useStore((state) => state.updateNodeField);
   const deleteNode = useStore((state) => state.deleteNode);
   const selectedNodesStore = useStore((state) => state.selectedNodes);
-  const timerRef = useRef(null);
   const isSelected = selected || (selectedNodesStore || []).includes(id);
+
   const hasOutput = data?.outputValue && data.outputValue.trim() !== '';
   const isDisplayOpen = data?.isDisplayOpen || false;
 
@@ -19,28 +19,8 @@ export const OutputNode = ({ id, data, selected }) => {
     updateNodeField(id, 'outputName', newName);
   };
 
-
-
-
-
-
-
-
-
-  const inputStyle = {
-    marginLeft: 6,
-    width: '100%',
-    padding: '8px 12px',
-    boxSizing: 'border-box',
-    background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
-    border: 'none',
-    borderRadius: '8px',
-    color: 'white',
-    fontSize: '12px',
-    boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
-  };
-
   const handles = [{ type: 'target', id: 'value' }];
+
 
   return (
     <div key={`${id}-${data?._timestamp || ''}-${data?.output || data?.outputValue || ''}-${isDisplayOpen}`}>

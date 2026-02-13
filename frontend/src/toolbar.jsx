@@ -178,10 +178,6 @@ export const PipelineToolbar = ({ onNodeSelect, onCustomNodeCreated }) => {
           </span>
         </div>
       ))}
-
-
-
-
     </div>
   );
 };

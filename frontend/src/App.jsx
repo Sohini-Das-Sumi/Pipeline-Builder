@@ -4,9 +4,8 @@ import ThreeBackground from './ThreeBackground.jsx';
 import { useStore } from './store';
 
 function App() {
-  console.log('App rendering');
-  
   // Get theme from store
+
   const theme = useStore((state) => state.theme);
   
   // Dynamic background color based on theme

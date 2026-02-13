@@ -14,11 +14,7 @@ export const DatabaseNode = ({ id, data, selected }) => {
   const isSelected = selected || (selectedNodesStore || []).includes(id);
   const isDisplayOpen = data?.isDisplayOpen || false;
 
-
-
   const { filterUI } = useFilterComponent({ id, data, updateNodeField });
-
-
 
   const handleConnectionChange = (e) => {
     updateNodeField(id, 'connectionString', e.target.value);

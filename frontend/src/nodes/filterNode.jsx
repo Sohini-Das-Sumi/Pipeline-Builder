@@ -28,28 +28,6 @@ export const FilterNode = ({ id, data, selected }) => {
     updateNodeField
   });
 
-
-
-  const inputStyle = {
-    marginLeft: 6,
-    width: '100%',
-    padding: '8px 12px',
-    boxSizing: 'border-box',
-    background: 'linear-gradient(45deg, #ff9a9e, #fecfef)',
-    border: 'none',
-    borderRadius: '8px',
-    color: 'white',
-    fontSize: '12px',
-    boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
-  };
-
-  const selectStyle = {
-    ...inputStyle,
-    height: '36px',
-  };
-
-
-
   const handles = [
     { type: 'target', id: 'input' },
     { type: 'source', id: 'filtered' },
