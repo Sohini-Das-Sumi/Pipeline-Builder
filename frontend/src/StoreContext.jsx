@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { StateManager } from './core/StateManager.js';
 import { MarkerType } from 'reactflow';
 
@@ -63,6 +63,9 @@ export const StoreProvider = ({ children }) => {
   const [loadTimestamp, setLoadTimestamp] = useState(null);
   const [canvasBounds, setCanvasBounds] = useState(null);
   
+  // Use ref to track if state has been loaded - avoids stale closure issues
+  const isLoadedRef = useRef(false);
+  
   // Function to update canvas bounds from the ReactFlow wrapper
   const updateCanvasBounds = useCallback((bounds) => {
     if (bounds) {
@@ -102,9 +105,10 @@ export const StoreProvider = ({ children }) => {
   }, [persistenceTimeout, persistState]);
 
   const loadState = useCallback(() => {
-    // Prevent recursive loadState calls
-    if (isLoaded || isInitializing) return;
+    // Prevent recursive loadState calls using ref
+    if (isLoadedRef.current || isInitializing) return;
     isInitializing = true;
+    isLoadedRef.current = true;
 
     try {
       const savedState = localStorage.getItem('pipelineState');
@@ -156,9 +160,9 @@ export const StoreProvider = ({ children }) => {
     }
 
     isInitializing = false;
-  }, [isLoaded]);
+  }, []);
 
-  // Load state on mount
+  // Load state on mount - only run once
   useEffect(() => {
     const timestamp = Date.now();
     setLoadTimestamp(timestamp);
@@ -168,7 +172,7 @@ export const StoreProvider = ({ children }) => {
       setSkipArrangement(false);
       setIsInitialLoad(false);
     }, 1000);
-  }, [loadState]);
+  }, []);
 
   const executePipeline = useCallback(async (...args) => {
     console.log('Store executePipeline called with args:', args);

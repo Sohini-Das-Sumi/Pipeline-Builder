@@ -47,7 +47,6 @@ export const PipelineUI = () => {
       onNodesChange,
       onEdgesChange,
       onConnect,
-      loadState,
       onSelectionChange,
       arrangeAllDisplays,
       theme,
@@ -82,12 +81,7 @@ export const PipelineUI = () => {
       addNode(newNode);
     }, [reactFlowInstance, reactFlowWrapper, getNodeID, addNode]);
 
-    // Load persisted state on component mount
-    useEffect(() => {
-      loadState();
-    }, []); // Empty dependency array to prevent infinite re-renders
-
-
+    // Load persisted state is handled by StoreContext.jsx - removed duplicate call here
 
     // Apply theme class to body
     useEffect(() => {

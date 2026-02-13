@@ -24,14 +24,13 @@ export default function LLMNode({ id, data, selected }) {
     updateNodeField
   });
 
+  // Use local state for output to ensure it displays correctly
+  const [output, setOutput] = useState(data?.output || '');
+
   // Apply filter to output if it exists
   const filteredOutput = output ? applyFilter(output) : '';
 
   const textareaRef = useRef(null);
-
-
-  // Use local state for output to ensure it displays correctly
-  const [output, setOutput] = useState(data?.output || '');
 
   // Sync output with store data - this ensures the output displays after pipeline execution
   useEffect(() => {
@@ -126,6 +125,13 @@ export default function LLMNode({ id, data, selected }) {
   ];
 
 
+  // Custom height for LLM node when display is open - larger height to ensure handles are properly positioned for edge connections
+  const nodeData = {
+    ...data,
+    displayHeight: isDisplayOpen ? '650px' : undefined,
+    nodeType: 'llm'
+  };
+
   return (
     <BaseNode 
       id={id} 
@@ -138,6 +144,7 @@ export default function LLMNode({ id, data, selected }) {
       isDisplayOpen={isDisplayOpen} 
       updateNodeField={updateNodeField} 
       nodeKey={`${id}-${isDisplayOpen}`}
+      data={nodeData}
     >
       {isDisplayOpen ? (
         <div className="space-y-3 p-3 min-h-[200px]">
