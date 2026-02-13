@@ -39,9 +39,16 @@ export const BaseNode = ({ id, title, handles, typeColor, onClick, onClose, extr
         visibility: 'visible',
         boxSizing: 'border-box',
         overflow: 'hidden',
+        // Use dynamic sizing from arrangeDisplays function when available
+        // Otherwise fall back to default sizes
         ...(isDisplayOpen ? {
-          width: '400px',
-          height: '400px'
+          width: data?.displayWidth ? `${data.displayWidth}px` : '400px',
+          height: data?.displayHeight ? `${data.displayHeight}px` : '580px',
+          minWidth: '200px',
+          minHeight: '150px',
+          maxWidth: '100%',
+          maxHeight: '100%',
+          transition: 'width 0.3s ease, height 0.3s ease'
         } : {
           width: '400px',
           height: '150px'

@@ -58,6 +58,22 @@ export const StoreProvider = ({ children }) => {
   const [skipArrangement, setSkipArrangement] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [loadTimestamp, setLoadTimestamp] = useState(null);
+  const [canvasBounds, setCanvasBounds] = useState(null);
+  
+  // Function to update canvas bounds from the ReactFlow wrapper
+  const updateCanvasBounds = useCallback((bounds) => {
+    if (bounds) {
+      setCanvasBounds({
+        width: bounds.width,
+        height: bounds.height,
+        left: bounds.left,
+        top: bounds.top,
+        right: bounds.right,
+        bottom: bounds.bottom
+      });
+      console.log('Canvas bounds updated:', bounds);
+    }
+  }, []);
   
   const persistState = useCallback(async () => {
     try {
@@ -292,28 +308,43 @@ export const StoreProvider = ({ children }) => {
     const openNodes = currentNodes.filter(n => n.data.isDisplayOpen);
     if (openNodes.length === 0) return currentNodes;
 
-    // Compute a responsive grid for open displays that fits within the viewport
-    const gap = 16; // px gap between displays
-    const topOffset = 48; // leave space for header/toolbars
-    const canvasWidth = Math.max(600, window.innerWidth - 10); // match actual canvas width (left 5px + right 5px)
-    const canvasHeight = Math.max(400, window.innerHeight - 130); // match actual canvas height (top 5px + bottom 125px)
+    // Configuration for 3x3 grid style with adjustable sizes
+    const gap = 20; // px gap between displays
+    const topOffset = 60; // leave space for header/toolbars
+    const minDisplayWidth = 250; // minimum width per display
+    const minDisplayHeight = 200; // minimum height per display
+    const maxDisplayWidth = 500; // maximum width per display
+    const maxDisplayHeight = 450; // maximum height per display
+    
+    // Use actual canvas bounds if available, otherwise fall back to window dimensions
+    // This provides more precise dynamic sizing based on the actual ReactFlow container
+    const canvasWidth = canvasBounds ? canvasBounds.width : Math.max(600, window.innerWidth - 10);
+    const canvasHeight = canvasBounds ? canvasBounds.height : Math.max(400, window.innerHeight - 130);
 
     const numDisplays = openNodes.length;
 
-    // Force 3x3 grid style: max 3 columns
+    // Strict 3x3 grid style: exactly 3 columns max, up to 3 rows
     const maxCols = 3;
+    const maxRows = 3;
     const cols = Math.min(numDisplays, maxCols);
-    const rows = Math.ceil(numDisplays / cols);
+    const rows = Math.min(Math.ceil(numDisplays / cols), maxRows);
 
     // Compute display sizes so that cols * width + gaps fit within canvasWidth
     const totalGapWidth = (cols + 1) * gap;
     let displayWidth = Math.floor((canvasWidth - totalGapWidth) / cols);
-    displayWidth = Math.max(200, displayWidth); // Minimum width
+    
+    // Apply min/max constraints for width
+    displayWidth = Math.max(minDisplayWidth, Math.min(maxDisplayWidth, displayWidth));
 
     // Compute height with same strategy, allow reasonable min/max
-    const totalGapHeight = (rows + 1) * gap;
-    let displayHeight = Math.floor((canvasHeight - totalGapHeight - topOffset) / rows);
-    displayHeight = Math.max(150, Math.min(displayHeight, 300)); // Minimum height, cap at 300px to fit canvas
+    const totalGapHeight = (rows + 1) * gap + topOffset;
+    let displayHeight = Math.floor((canvasHeight - totalGapHeight) / rows);
+    
+    // Apply min/max constraints for height
+    displayHeight = Math.max(minDisplayHeight, Math.min(maxDisplayHeight, displayHeight));
+
+    // If we have fewer nodes than grid cells, adjust to center them nicely
+    const effectiveCols = numDisplays < cols ? numDisplays : cols;
 
     // Get viewport information for coordinate conversion
     let viewportRect = { left: 0, top: 0 };
@@ -476,7 +507,7 @@ export const StoreProvider = ({ children }) => {
 
     // Fallback: if StateManager update failed, return currentNodes unchanged
     return currentNodes;
-  }, [onNodesChange, reactFlowInstance]);
+  }, [onNodesChange, reactFlowInstance, canvasBounds]);
 
   const onSelectionChange = useCallback(async (elements) => {
     if (isUpdatingSelection || isInitialLoad) return; // Prevent recursive calls and skip during initial load
@@ -676,9 +707,10 @@ export const StoreProvider = ({ children }) => {
         console.error('openSelectedDisplays failed', e);
       }
     },
-    persistState,
+persistState,
     schedulePersist,
     setOnSelectionChangeCallback: setOnSelectionChangeCallbackFunc,
+    updateCanvasBounds,
   };
 
   // Expose store to window for testing

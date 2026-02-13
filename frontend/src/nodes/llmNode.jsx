@@ -17,40 +17,28 @@ export default function LLMNode({ id, data, selected }) {
 
   const textareaRef = useRef(null);
 
+  // Use local state for output to ensure it displays correctly
   const [output, setOutput] = useState(data?.output || '');
-  const [userPrompt, setUserPrompt] = useState(data?.userPrompt || '');
-  const [systemPrompt, setSystemPrompt] = useState(data?.systemPrompt || '');
 
+  // Sync output with store data - this ensures the output displays after pipeline execution
   useEffect(() => {
-    setOutput(data?.output || '');
+    if (data?.output !== undefined && data?.output !== output) {
+      setOutput(data.output);
+    }
   }, [data?.output]);
 
+  // Force re-render when output changes to ensure it displays
   useEffect(() => {
-    setUserPrompt(data?.userPrompt || '');
-  }, [data?.userPrompt]);
-
-  useEffect(() => {
-    setSystemPrompt(data?.systemPrompt || '');
-  }, [data?.systemPrompt]);
-
-  // Removed auto-opening on selection - displays stay closed by default
-
-  // Force re-render when output changes
-  useEffect(() => {
-    if (output) {
-      console.log('LLMNode output updated:', output);
-    }
+    console.log('LLMNode output updated:', output);
   }, [output]);
 
   const handleSystemPromptChange = (e) => {
     const newValue = e.target.value;
-    setSystemPrompt(newValue);
     updateNodeField(id, 'systemPrompt', newValue);
   };
 
   const handleUserPromptChange = (e) => {
     const newValue = e.target.value;
-    setUserPrompt(newValue);
     updateNodeField(id, 'userPrompt', newValue);
   };
 
@@ -124,8 +112,18 @@ export default function LLMNode({ id, data, selected }) {
   ];
 
   return (
-    <div key={`${id}-${data?._timestamp || ''}`}>
-      <BaseNode id={id} title="LLM" handles={handles} onClose={() => deleteNode(id)} selectNode={selectNode} className="transition-all duration-300" isSelected={isSelected} isDisplayOpen={isDisplayOpen} updateNodeField={updateNodeField} nodeKey={`${id}-${isDisplayOpen}`}>
+    <BaseNode 
+      id={id} 
+      title="LLM" 
+      handles={handles} 
+      onClose={() => deleteNode(id)} 
+      selectNode={selectNode} 
+      className="transition-all duration-300" 
+      isSelected={isSelected} 
+      isDisplayOpen={isDisplayOpen} 
+      updateNodeField={updateNodeField} 
+      nodeKey={`${id}-${isDisplayOpen}`}
+    >
       {isDisplayOpen ? (
         <div className="space-y-3 p-3 min-h-[200px]">
           <div className="flex items-center justify-between mb-2">
@@ -163,7 +161,7 @@ export default function LLMNode({ id, data, selected }) {
               <label htmlFor={`${id}-systemPrompt`} className="block text-xs font-medium text-slate-300 mb-1">System Prompt</label>
               <textarea
                 id={`${id}-systemPrompt`}
-              value={systemPrompt}
+                value={data?.systemPrompt || ''}
                 onChange={handleSystemPromptChange}
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, 'systemPrompt')}
@@ -184,23 +182,24 @@ export default function LLMNode({ id, data, selected }) {
                 onDrop={(e) => handleDrop(e, 'userPrompt')}
                 rows={5}
                 style={textareaStyle}
-              className="focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="focus:outline-none focus:ring-1 focus:ring-blue-500"
                 placeholder="Enter user prompt or drag text/files here"
                 onClick={(e) => e.stopPropagation()}
               />
             </div>
+            {/* Output Area - This displays the LLM response after pipeline execution */}
             <div>
               <label htmlFor={`${id}-output`} className="block text-xs font-medium text-slate-300 mb-1">Output</label>
               <textarea
                 id={`${id}-output`}
-              ref={textareaRef}
+                ref={textareaRef}
                 readOnly
                 rows={5}
-              value={output}
+                value={output}
                 style={textareaStyle}
                 placeholder="LLM response will appear here"
                 onClick={(e) => e.stopPropagation()}
-              className="focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
         </div>
@@ -218,6 +217,5 @@ export default function LLMNode({ id, data, selected }) {
         </button>
       )}
     </BaseNode>
-    </div>
   );
 }

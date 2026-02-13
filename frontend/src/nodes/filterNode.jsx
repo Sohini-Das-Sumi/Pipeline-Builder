@@ -10,7 +10,17 @@ export const FilterNode = ({ id, data, selected }) => {
   const deleteNode = useStore((state) => state.deleteNode);
   const selectedNodesStore = useStore((state) => state.selectedNodes);
   const isSelected = selected || (selectedNodesStore || []).includes(id);
+  
+  // Sync isDisplayOpen with selected state - this ensures arrangeDisplays can find the node
+  // when it's selected (which is one way to open the filter display)
   const isDisplayOpen = data?.isDisplayOpen || selected;
+  
+  // Effect to sync isDisplayOpen with selected state in node data
+  useEffect(() => {
+    if (selected && !data?.isDisplayOpen) {
+      updateNodeField(id, 'isDisplayOpen', true);
+    }
+  }, [selected, data?.isDisplayOpen, id, updateNodeField]);
 
   const { filterUI, applyFilter } = useFilterComponent({
     id,

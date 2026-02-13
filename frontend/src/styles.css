@@ -194,12 +194,6 @@
   overflow: hidden;
 }
 
-.common-node.node-closed {
-  width: 700px !important;
-  height: 50px !important;
-}
-
-.common-node.node-open {
-  width: 700px !important;
-  height: 100px !important;
-}
+/* Removed fixed sizes to allow dynamic sizing from arrangeDisplays function */
+/* The node sizes are now controlled by the arrangeDisplays function in StoreContext.jsx */
+/* which calculates sizes based on canvas bounds and number of nodes in the 3x3 grid */
