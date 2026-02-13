@@ -1,4 +1,4 @@
-# Pipeline Builder - GitHub Repository Description
+# Pipeline Builder
 
 ---
 
