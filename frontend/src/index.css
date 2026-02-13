@@ -47,6 +47,7 @@ code {
   --node-button-border: #475569;
   --node-button-hover: #4b5563;
   --node-closed-text-color: #ffff00;
+  --bg-color: #000000;
 }
 
 .theme-dark .react-flow__node-default {
@@ -95,6 +96,7 @@ code {
   --node-button-bg: #e5e7eb;
   --node-button-border: #d1d5db;
   --node-button-hover: #d1d5db;
+  --bg-color: #ffffff;
 }
 
 .theme-light .react-flow__node-default {

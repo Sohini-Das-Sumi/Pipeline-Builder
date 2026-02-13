@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import { getCustomNodes } from './nodes/CustomNodeLibrary';
 import { useStore } from './StoreContext.jsx';
 
+// Function to get text color class based on theme
+const getTextColorClass = (theme) => {
+  return theme === 'light' ? 'text-gray-800' : 'text-white';
+};
+
 // Function to map hex color to Tailwind background class
 const getTailwindBgClass = (color) => {
   const colorMap = {
@@ -21,6 +26,8 @@ const getTailwindBgClass = (color) => {
 
 export const PipelineToolbar = ({ onNodeSelect, onCustomNodeCreated }) => {
   const [customNodes, setCustomNodes] = useState(getCustomNodes());
+  const theme = useStore((state) => state.theme);
+  const textColorClass = getTextColorClass(theme);
 
   const onDragStart = (event, nodeType) => {
     event.dataTransfer.setData('application/reactflow', JSON.stringify({ nodeType }));
@@ -42,7 +49,7 @@ export const PipelineToolbar = ({ onNodeSelect, onCustomNodeCreated }) => {
         onClick={(event) => handleNodeClick(event, 'customInput')}
         draggable
       >
-        <span className="text-white text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2">
+        <span className={`${textColorClass} text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2`}>
           <div className="w-2 h-2 rounded-full bg-green-400"></div>
           Input
         </span>
@@ -54,7 +61,7 @@ export const PipelineToolbar = ({ onNodeSelect, onCustomNodeCreated }) => {
         onClick={(event) => handleNodeClick(event, 'text')}
         draggable
       >
-        <span className="text-white text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2">
+        <span className={`${textColorClass} text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2`}>
           <div className="w-2 h-2 rounded-full bg-cyan-400"></div>
           Text
         </span>
@@ -66,7 +73,7 @@ export const PipelineToolbar = ({ onNodeSelect, onCustomNodeCreated }) => {
         onClick={(event) => handleNodeClick(event, 'llm')}
         draggable
       >
-        <span className="text-white text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2">
+        <span className={`${textColorClass} text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2`}>
           <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
           LLM
         </span>
@@ -78,7 +85,7 @@ export const PipelineToolbar = ({ onNodeSelect, onCustomNodeCreated }) => {
         onClick={(event) => handleNodeClick(event, 'customOutput')}
         draggable
       >
-        <span className="text-white text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2">
+        <span className={`${textColorClass} text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2`}>
           <div className="w-2 h-2 rounded-full bg-red-500"></div>
           Output
         </span>
@@ -90,7 +97,7 @@ export const PipelineToolbar = ({ onNodeSelect, onCustomNodeCreated }) => {
         onClick={(event) => handleNodeClick(event, 'note')}
         draggable
       >
-        <span className="text-white text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2">
+        <span className={`${textColorClass} text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2`}>
           <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
           Note
         </span>
@@ -102,7 +109,7 @@ export const PipelineToolbar = ({ onNodeSelect, onCustomNodeCreated }) => {
         onClick={(event) => handleNodeClick(event, 'filter')}
         draggable
       >
-        <span className="text-white text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2">
+        <span className={`${textColorClass} text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2`}>
           <div className="w-2 h-2 rounded-full bg-pink-500"></div>
           Filter
         </span>
@@ -114,7 +121,7 @@ export const PipelineToolbar = ({ onNodeSelect, onCustomNodeCreated }) => {
         onClick={(event) => handleNodeClick(event, 'database')}
         draggable
       >
-        <span className="text-white text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2">
+        <span className={`${textColorClass} text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2`}>
           <div className="w-2 h-2 rounded-full bg-teal-400"></div>
           Database
         </span>
@@ -126,7 +133,7 @@ export const PipelineToolbar = ({ onNodeSelect, onCustomNodeCreated }) => {
         onClick={(event) => handleNodeClick(event, 'image')}
         draggable
       >
-        <span className="text-white text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2">
+        <span className={`${textColorClass} text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2`}>
           <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
           Image
         </span>
@@ -138,7 +145,7 @@ export const PipelineToolbar = ({ onNodeSelect, onCustomNodeCreated }) => {
         onClick={(event) => handleNodeClick(event, 'timer')}
         draggable
       >
-        <span className="text-white text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2">
+        <span className={`${textColorClass} text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2`}>
           <div className="w-2 h-2 rounded-full bg-slate-400"></div>
           Timer
         </span>
@@ -150,7 +157,7 @@ export const PipelineToolbar = ({ onNodeSelect, onCustomNodeCreated }) => {
         onClick={(event) => handleNodeClick(event, 'customNodeManager')}
         draggable
       >
-        <span className="text-white text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2">
+        <span className={`${textColorClass} text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2`}>
           <div className="w-2 h-2 rounded-full bg-purple-500"></div>
           Node Manager
         </span>
@@ -165,7 +172,7 @@ export const PipelineToolbar = ({ onNodeSelect, onCustomNodeCreated }) => {
           onClick={(event) => handleNodeClick(event, customNode.id)}
           draggable
         >
-          <span className="text-white text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2">
+          <span className={`${textColorClass} text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2`}>
             <div className={`w-2 h-2 rounded-full ${getTailwindBgClass(customNode.color)}`}></div>
             {customNode.title}
           </span>

@@ -30,9 +30,10 @@ const ThreeBackground = ({ theme = 'dark' }) => {
             waveMaterial.emissive.setHex(0x8a2be2);
             waveMaterial.opacity = 0.3; // More transparent
           } else {
-            waveMaterial.color.setHex(0xffffff);
-            waveMaterial.emissive.setHex(0x000000);
-            waveMaterial.opacity = 0.0;
+            // Light theme - Neon pink waves
+            waveMaterial.color.setHex(0xFF1493); // Neon pink
+            waveMaterial.emissive.setHex(0xFF1493); // Neon pink glow
+            waveMaterial.opacity = 0.4; // Visible on white
           }
           waveMaterial.needsUpdate = true;
         }
@@ -289,7 +290,10 @@ const ThreeBackground = ({ theme = 'dark' }) => {
 
   if (!backgroundVisible) return null;
 
-  return <div ref={mountRef} className="absolute top-0 left-0 right-0 z-0 three-background" style={{ bottom: '120px', border: '5px solid #8a2be2', borderRadius: '15px' }} />;
+  const borderColor = theme === 'dark' ? '#8a2be2' : '#FF1493';
+  const boxShadow = theme === 'light' ? '0 0 25px rgba(255, 20, 147, 0.6), inset 0 0 20px rgba(255, 20, 147, 0.1)' : 'none';
+
+  return <div ref={mountRef} className="absolute top-0 left-0 right-0 z-0 three-background" style={{ bottom: '120px', border: `5px solid ${borderColor}`, borderRadius: '15px', boxShadow: boxShadow }} />;
 };
 
 export default ThreeBackground;
