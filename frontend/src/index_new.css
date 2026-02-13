@@ -1,0 +1,384 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Variables for theming */
+:root {
+  --bg-color: #000000;
+  --text-color: #e5e7eb;
+  --node-bg: rgba(0, 0, 0, 0.9);
+  --node-border: #374151;
+  --node-color: #e5e7eb;
+  --controls-bg: #1e293b;
+  --controls-border: #475569;
+  --minimap-bg: #1e293b;
+  --minimap-border: #475569;
+  --input-field-bg: #374151;
+  --input-field-border: #4b5563;
+  --input-field-color: #ffffff;
+  --input-field-placeholder: #9ca3af;
+  --input-label-color: #e5e7eb;
+  --input-button-bg: #374151;
+  --input-button-border: #4b5563;
+  --input-button-hover: #4b5563;
+  --text-secondary: #9ca3af;
+  --node-header-bg: rgba(0, 0, 0, 0.9);
+  --node-header-border: #374151;
+  --node-header-color: #e5e7eb;
+  --node-button-bg: #374151;
+  --node-button-border: #475569;
+  --node-button-hover: #4b5563;
+  --node-closed-text-color: #ffff00;
+}
+
+/* Dark theme styles */
+[data-theme="dark"] body {
+  background-color: #000000 !important;
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .app-container {
+  background-color: #000000 !important;
+}
+
+[data-theme="dark"] .react-flow__node-default {
+  background-color: rgba(0, 0, 0, 0.9) !important;
+  border: 1px solid #374151 !important;
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .react-flow__controls {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+}
+
+[data-theme="dark"] .react-flow__minimap {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+}
+
+[data-theme="dark"] .react-flow__controls-theme {
+  background-color: #1e293b !important;
+  border: 1px solid #475569 !important;
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .three-background {
+  background-color: #000000 !important;
+}
+
+[data-theme="dark"] .node-input {
+  background-color: #374151 !important;
+  border: 1px solid #4b5563 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .node-input::placeholder {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .node-select {
+  background-color: #374151 !important;
+  border: 1px solid #4b5563 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .node-label {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .node-button {
+  background-color: #374151 !important;
+  border: 1px solid #4b5563 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .node-text-secondary {
+  color: #9ca3af !important;
+}
+
+/* Light theme styles */
+[data-theme="light"] body {
+  background-color: #ffffff !important;
+  color: #374151 !important;
+}
+
+[data-theme="light"] .app-container {
+  background-color: #ffffff !important;
+}
+
+[data-theme="light"] .react-flow__node-default {
+  background-color: rgba(248, 249, 250, 0.95) !important;
+  border: 1px solid #d1d5db !important;
+  color: #374151 !important;
+}
+
+[data-theme="light"] .react-flow__controls {
+  background-color: #f3f4f6 !important;
+  border-color: #9ca3af !important;
+}
+
+[data-theme="light"] .react-flow__minimap {
+  background-color: #f3f4f6 !important;
+  border-color: #9ca3af !important;
+}
+
+[data-theme="light"] .react-flow__controls-theme {
+  background-color: #f3f4f6 !important;
+  border: 1px solid #9ca3af !important;
+  color: #374151 !important;
+}
+
+[data-theme="light"] .three-background {
+  background-color: #ffffff !important;
+}
+
+[data-theme="light"] .node-input {
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  color: #374151 !important;
+}
+
+[data-theme="light"] .node-input::placeholder {
+  color: #6b7280 !important;
+}
+
+[data-theme="light"] .node-select {
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  color: #374151 !important;
+}
+
+[data-theme="light"] .node-label {
+  color: #374151 !important;
+}
+
+[data-theme="light"] .node-button {
+  background-color: #f3f4f6 !important;
+  border: 1px solid #d1d5db !important;
+  color: #374151 !important;
+}
+
+[data-theme="light"] .node-text-secondary {
+  color: #6b7280 !important;
+}
+
+[data-theme="light"] .node-closed-text {
+  color: #374151 !important;
+}
+
+/* Base styles */
+body {
+  margin: 0;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+/* App container background */
+.app-container {
+  background-color: var(--bg-color) !important;
+}
+
+/* Toolbar container background */
+.toolbar-container {
+  background-color: var(--controls-bg) !important;
+  border-color: var(--controls-border) !important;
+}
+
+/* React Flow Grid Customization */
+.react-flow__background {
+  background-color: transparent;
+}
+
+/* Override default React Flow node backgrounds */
+.react-flow__node-default {
+  background-color: var(--node-bg) !important;
+  border: 1px solid var(--node-border) !important;
+  color: var(--node-color) !important;
+}
+
+.react-flow__node-default:hover {
+  border-color: #6366f1 !important;
+}
+
+/* Controls styling */
+.react-flow__controls {
+  background-color: var(--controls-bg) !important;
+  border-color: var(--controls-border) !important;
+}
+
+/* Minimap styling */
+.react-flow__minimap {
+  background-color: var(--minimap-bg) !important;
+  border-color: var(--minimap-border) !important;
+}
+
+/* Theme toggle button specific styling */
+.react-flow__controls-theme {
+  background-color: var(--controls-bg) !important;
+  border: 1px solid var(--controls-border) !important;
+  color: var(--node-color) !important;
+}
+
+.react-flow__controls-theme:hover {
+  background-color: var(--node-bg) !important;
+  border-color: #6366f1 !important;
+}
+
+/* Three.js background styling */
+.three-background {
+  background-color: var(--bg-color) !important;
+}
+
+/* Node input styling */
+.node-input {
+  background-color: var(--input-field-bg) !important;
+  border: 1px solid var(--input-field-border) !important;
+  color: var(--input-field-color) !important;
+}
+
+.node-input::placeholder {
+  color: var(--input-field-placeholder) !important;
+}
+
+.node-input:focus {
+  outline: none;
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 1px #6366f1 !important;
+}
+
+.node-select {
+  background-color: var(--input-field-bg) !important;
+  border: 1px solid var(--input-field-border) !important;
+  color: var(--input-field-color) !important;
+}
+
+.node-select:focus {
+  outline: none;
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 1px #6366f1 !important;
+}
+
+.node-label {
+  color: var(--input-label-color) !important;
+}
+
+.node-button {
+  background-color: var(--input-button-bg) !important;
+  border: 1px solid var(--input-button-border) !important;
+  color: var(--input-field-color) !important;
+}
+
+.node-button:hover {
+  background-color: var(--input-button-hover) !important;
+}
+
+.node-text-secondary {
+  color: var(--text-secondary) !important;
+}
+
+/* Drag and drop zone styling */
+.drag-drop-zone {
+  border-color: var(--input-field-border) !important;
+  background-color: var(--node-bg) !important;
+  color: var(--text-color) !important;
+}
+
+/* Node closed text styling */
+.node-closed-text {
+  color: var(--node-closed-text-color) !important;
+  font-size: 12px;
+  text-align: center;
+  padding: 8px;
+}
+
+.drag-drop-zone:hover {
+  border-color: #6366f1 !important;
+  background-color: var(--input-button-hover) !important;
+}
+
+/* Smooth handle styling */
+.react-flow__handle {
+  width: 12px !important;
+  height: 12px !important;
+  background: #6366f1 !important;
+  border: 2px solid var(--bg-color) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+}
+
+.react-flow__handle:hover {
+  background: #4f46e5 !important;
+  transform: scale(1.2) !important;
+  box-shadow: 0 4px 8px rgba(99, 102, 241, 0.4) !important;
+}
+
+.react-flow__handle::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.2);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.react-flow__handle:hover::after {
+  opacity: 1;
+}
+
+.react-flow__handle.react-flow__handle-connectable:hover {
+  border-color: #4f46e5 !important;
+}
+
+/* Custom animations */
+@keyframes drop-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.9);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateY(-10px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-drop-in {
+  animation: drop-in 0.6s ease-out;
+}
+
+.animate-bounce {
+  animation: bounce 0.5s ease-in-out;
+}
+
+@keyframes sparkle-twinkle {
+  0% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "name": "frontend-20260126t045146z-1-001",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "cd frontend && react-scripts test",
+    "start": "cd frontend && react-scripts start",
+    "dev": "cd frontend && next dev",
+    "build": "cd frontend && react-scripts build",
+    "serve": "cd frontend && next start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "reactflow": "^11.10.1",
+    "zustand": "^4.4.7",
+    "tailwindcss": "^3.3.6",
+    "postcss": "^8.4.32",
+    "autoprefixer": "^10.4.16",
+    "@react-three/fiber": "^8.15.16",
+    "@react-three/drei": "^9.88.13",
+    "three": "^0.158.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

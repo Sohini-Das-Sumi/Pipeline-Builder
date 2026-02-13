@@ -1,0 +1,324 @@
+// core/Node.js - Simplified Node class hierarchy with reduced duplication
+
+// Helper function to validate and sanitize position coordinates
+const validatePosition = (position) => {
+  if (!position || typeof position !== 'object') {
+    return { x: 0, y: 0 };
+  }
+  const x = typeof position.x === 'number' && !isNaN(position.x) && isFinite(position.x) ? position.x : 0;
+  const y = typeof position.y === 'number' && !isNaN(position.y) && isFinite(position.y) ? position.y : 0;
+  return { x, y };
+};
+
+export class Node {
+  constructor(id, type, position, data = {}, selected = false) {
+    this.id = id;
+    this.type = type;
+    this.position = validatePosition(position);
+    this.data = { ...data };
+    this.selectable = true;
+    this.selected = selected;
+  }
+
+  updateField(fieldName, fieldValue) {
+    this.data[fieldName] = fieldValue;
+  }
+
+  getField(fieldName) {
+    return this.data[fieldName];
+  }
+
+  setSelected(selected) {
+    this.selected = selected;
+  }
+
+  toJSON() {
+    return {
+      id: this.id,
+      type: this.type,
+      position: {
+        x: Math.round(this.position.x),
+        y: Math.round(this.position.y)
+      },
+      data: { ...this.data },
+      selectable: this.selectable,
+      selected: this.selected
+    };
+  }
+
+  // Abstract method - must be implemented by subclasses
+  async execute(inputs = {}) {
+    throw new Error('Execute method must be implemented by subclass');
+  }
+}
+
+// Base class for API-based nodes with common error handling
+export class ApiNode extends Node {
+  async handleApiError(response) {
+    try {
+      const errorText = await response.text();
+      if (errorText.includes('<!DOCTYPE')) {
+        return 'Backend server is not running or not reachable. Please start the backend server.';
+      }
+      try {
+        const errorData = JSON.parse(errorText);
+        return `Error: ${errorData.detail || errorText}`;
+      } catch (e) {
+        return `Error: ${errorText}`;
+      }
+    } catch (e) {
+      return 'Unknown error';
+    }
+  }
+
+  handleException(error) {
+    if (error.name === 'AbortError') {
+      return 'Error: Request timed out after 120 seconds';
+    }
+    if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+      return 'Backend server is not running or not reachable. Please start the backend server.';
+    }
+    return `Error: ${error.message}`;
+  }
+
+  async makeApiCall(url, data, timeout = 60000) {
+    const abortController = new AbortController();
+    const timeoutId = setTimeout(() => abortController.abort(), timeout);
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        signal: abortController.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        return { success: true, data: await response.json() };
+      } else {
+        return { success: false, error: await this.handleApiError(response) };
+      }
+    } catch (error) {
+      clearTimeout(timeoutId);
+      return { success: false, error: this.handleException(error) };
+    }
+  }
+}
+
+
+// Simplified Node Classes with minimal duplication
+export class InputNode extends Node {
+  async execute(inputs = {}) {
+    return { output: this.data.inputValue, inputValue: this.data.inputValue };
+  }
+}
+
+export class LLMNode extends ApiNode {
+  async execute(inputs = {}) {
+    console.log(`LLMNode execute called for node ${this.id}`);
+
+    // Prioritize userPrompt from inputs, then fall back to node data
+    const userPrompt = inputs.userPrompt || this.data.userPrompt || '';
+    const systemPrompt = inputs.systemPrompt || this.data.systemPrompt || '';
+
+    console.log(`LLMNode execute called with inputs:`, inputs);
+    console.log(`LLMNode data:`, this.data);
+    console.log(`LLMNode using userPrompt:`, userPrompt);
+
+    // If no userPrompt, set a default one for testing
+    const finalUserPrompt = userPrompt || 'Hello, can you respond with a simple greeting?';
+
+    console.log(`LLMNode making API call to /api/llm with:`, {
+      model: this.data.model || 'llama2',
+      systemPrompt: systemPrompt,
+      userPrompt: finalUserPrompt,
+      inputs: inputs
+    });
+
+    let result;
+    try {
+      result = await this.makeApiCall('/api/llm', {
+        model: this.data.model || 'llama2',
+        systemPrompt: systemPrompt,
+        userPrompt: finalUserPrompt,
+        inputs: inputs
+      }, 120000);
+    } catch (error) {
+      result = { success: false, error: this.handleException(error) };
+    }
+
+    console.log(`LLMNode API result:`, result);
+
+    let output;
+    if (result.success) {
+      const response = result.data.response;
+      const trimmedResponse = response ? String(response).trim() : '';
+      output = trimmedResponse ? trimmedResponse : 'LLM returned an empty response';
+      console.log(`LLMNode setting output to:`, output);
+    } else {
+      output = result.error;
+      console.log(`LLMNode setting error output to:`, output);
+    }
+
+    console.log(`Before updateField - LLMNode data:`, this.data);
+    this.updateField('output', output);
+    this.updateField('_timestamp', Date.now());
+    console.log(`After updateField - LLMNode data:`, this.data);
+    console.log(`LLMNode execute completed, returning:`, { output });
+    console.log(`LLMNode final output field:`, this.getField('output'));
+    return { output };
+  }
+}
+
+export class OutputNode extends Node {
+  async execute(inputs = {}) {
+    const outputValue = inputs.inputData || inputs.outputValue || this.data.outputValue || '';
+    this.updateField('output', outputValue);
+    return { outputValue };
+  }
+}
+
+export class FilterNode extends Node {
+  async execute(inputs = {}) {
+    const inputData = inputs.inputData || '';
+    const { filterType, filterValue } = this.data;
+
+    let filteredOutput = '';
+
+    if (inputData) {
+      const operations = {
+        contains: (data, filter) => data.includes(filter) ? data : '',
+        equals: (data, filter) => data === filter ? data : '',
+        startsWith: (data, filter) => data.startsWith(filter) ? data : '',
+        endsWith: (data, filter) => data.endsWith(filter) ? data : '',
+        greaterThan: (data, filter) => {
+          const numData = parseFloat(data), numFilter = parseFloat(filter);
+          return (!isNaN(numData) && !isNaN(numFilter) && numData > numFilter) ? data : '';
+        },
+        lessThan: (data, filter) => {
+          const numData = parseFloat(data), numFilter = parseFloat(filter);
+          return (!isNaN(numData) && !isNaN(numFilter) && numData < numFilter) ? data : '';
+        },
+        regex: (data, filter) => {
+          try {
+            return new RegExp(filter).test(data) ? data : '';
+          } catch (e) {
+            return `Error: Invalid regex - ${filter}`;
+          }
+        }
+      };
+
+      filteredOutput = operations[filterType] ?
+        operations[filterType](inputData, filterValue) : inputData;
+    }
+
+    this.updateField('output', filteredOutput);
+    return { output: filteredOutput };
+  }
+}
+
+export class ImageNode extends ApiNode {
+  async execute(inputs = {}) {
+    const imageUrl = inputs.imageUrl || this.data.imageUrl || '';
+
+    if (!imageUrl && !this.data.imageFile) {
+      const error = 'Error: No image provided';
+      this.updateField('output', error);
+      return { output: error };
+    }
+
+    if (this.data.imageFile) {
+      const error = 'Error: File upload not implemented in pipeline';
+      this.updateField('output', error);
+      return { output: error };
+    }
+
+    // Mock response since backend is not available
+    const mockOutput = `Mock Image Analysis: URL ${imageUrl}, Match Type: ${this.data.matchType}, Threshold: ${this.data.threshold}`;
+    this.updateField('output', mockOutput);
+    return { output: mockOutput };
+  }
+}
+
+export class TextNode extends Node {
+  async execute(inputs = {}) {
+    return { output: this.data.text };
+  }
+}
+
+export class DatabaseNode extends Node {
+  async execute(inputs = {}) {
+    return { output: this.data.results };
+  }
+}
+
+export class NoteNode extends Node {
+  async execute(inputs = {}) {
+    return { output: this.data.note };
+  }
+}
+
+export class TimerNode extends Node {
+  async execute(inputs = {}) {
+    return { output: this.data.interval };
+  }
+}
+
+// Node Factory - simplified with recursive instantiation
+export class NodeFactory {
+  static nodeConfigs = {
+    'customInput': {
+      class: InputNode,
+      defaults: { inputName: 'input_', inputType: 'Text', inputValue: '', isAnimating: true, isVisible: true }
+    },
+    'llm': {
+      class: LLMNode,
+      defaults: { model: 'llama2', systemPrompt: '', userPrompt: '', output: '', isVisible: true }
+    },
+    'customOutput': {
+      class: OutputNode,
+      defaults: { outputName: 'output_', outputType: 'Text', outputValue: '', isVisible: true }
+    },
+    'filter': {
+      class: FilterNode,
+      defaults: { filterType: 'contains', filterValue: '', output: '', isVisible: true }
+    },
+    'image': {
+      class: ImageNode,
+      defaults: { imageUrl: '', imageFile: null, matchType: 'similar', threshold: 10, output: '', isVisible: true }
+    },
+    'text': {
+      class: TextNode,
+      defaults: { text: '', isVisible: true }
+    },
+    'database': {
+      class: DatabaseNode,
+      defaults: { query: '', results: '', isVisible: true }
+    },
+    'note': {
+      class: NoteNode,
+      defaults: { note: '', isVisible: true }
+    },
+    'timer': {
+      class: TimerNode,
+      defaults: { interval: '1000', isVisible: true }
+    }
+  };
+
+  static createNode(type, id, position, data = {}) {
+    const typeStr = typeof type === 'string' ? type : 'default';
+    const config = this.nodeConfigs[typeStr];
+    if (config) {
+      // Merge defaults with provided data
+      const mergedData = { ...config.defaults, ...data };
+      // Apply naming patterns recursively
+      if (typeStr.includes('Output')) {
+        mergedData.outputName = 'output_' + (parseInt(id.split('-')[1], 10) || 1);
+      }
+      return new config.class(id, typeStr, position, mergedData);
+    }
+    return new Node(id, typeStr, position, data);
+  }
+}
