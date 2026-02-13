@@ -66,6 +66,12 @@ export const StoreProvider = ({ children }) => {
   // Use ref to track if state has been loaded - avoids stale closure issues
   const isLoadedRef = useRef(false);
   
+  // Use ref to track current nodes - avoids stale closure issues in callbacks
+  const nodesRef = useRef(nodes);
+  useEffect(() => {
+    nodesRef.current = nodes;
+  }, [nodes]);
+  
   // Function to update canvas bounds from the ReactFlow wrapper
   const updateCanvasBounds = useCallback((bounds) => {
     if (bounds) {
@@ -191,8 +197,22 @@ export const StoreProvider = ({ children }) => {
     // Get updated nodes from stateManager after syncing execution results
     const finalUpdatedNodes = getStateManager().getNodes();
 
+    // Create a map of current node display states to preserve them
+    const currentDisplayStates = new Map();
+    nodesRef.current.forEach(node => {
+      if (node.id && node.data && node.data.hasOwnProperty('isDisplayOpen')) {
+        currentDisplayStates.set(node.id, node.data.isDisplayOpen);
+      }
+    });
+
     // Use updated nodes from stateManager as base, preserve store-specific fields
     const syncedNodes = finalUpdatedNodes.map(updatedNode => {
+      // Preserve existing isDisplayOpen state from current nodes in store
+      // Default to false if not found, except for LLM nodes which should show output
+      const preservedIsDisplayOpen = currentDisplayStates.has(updatedNode.id) 
+        ? currentDisplayStates.get(updatedNode.id)
+        : (updatedNode.type === 'llm');
+
       // Create completely new node object to force React re-render
       const newNode = {
         id: updatedNode.id,
@@ -201,7 +221,7 @@ export const StoreProvider = ({ children }) => {
         data: {
           ...updatedNode.data,
           selected: false,
-          isDisplayOpen: updatedNode.type === 'llm' ? true : false, // Keep LLM display open to show output
+          isDisplayOpen: preservedIsDisplayOpen,
           isVisible: true,
         },
         // Ensure position is valid to prevent SVG path NaN errors
