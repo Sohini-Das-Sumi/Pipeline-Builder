@@ -216,8 +216,10 @@ export const InputNode = ({ id, data, selected }) => {
               />
             )}
           </div>
+          {filterUI}
         </div>
       ) : (
+
         <div className="node-closed-text">
           Click to configure
         </div>

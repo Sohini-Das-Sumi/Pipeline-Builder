@@ -5,6 +5,8 @@ import React, { useEffect, useCallback, useRef, useState } from 'react';
 import { Position } from 'reactflow';
 import { BaseNode } from './BaseNode';
 import { useStore } from '../store';
+import { useFilterComponent } from './FilterComponent';
+
 
 export default function LLMNode({ id, data, selected }) {
   const updateNodeField = useStore((state) => state.updateNodeField);
@@ -16,7 +18,17 @@ export default function LLMNode({ id, data, selected }) {
 
   const isDisplayOpen = data?.isDisplayOpen || false;
 
+  const { filterUI, applyFilter } = useFilterComponent({
+    id,
+    data,
+    updateNodeField
+  });
+
+  // Apply filter to output if it exists
+  const filteredOutput = output ? applyFilter(output) : '';
+
   const textareaRef = useRef(null);
+
 
   // Use local state for output to ensure it displays correctly
   const [output, setOutput] = useState(data?.output || '');
@@ -110,7 +122,9 @@ export default function LLMNode({ id, data, selected }) {
     { type: 'target', id: 'system' },
     { type: 'target', id: 'prompt' },
     { type: 'source', id: 'response' },
+    { type: 'target', id: 'filter', position: Position.Top }
   ];
+
 
   return (
     <BaseNode 
@@ -196,15 +210,17 @@ export default function LLMNode({ id, data, selected }) {
                 ref={textareaRef}
                 readOnly
                 rows={5}
-                value={output}
+                value={filteredOutput || output}
                 style={textareaStyle}
                 placeholder="LLM response will appear here"
                 onClick={(e) => e.stopPropagation()}
                 className="focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
+            {filterUI}
         </div>
       ) : (
+
         <button
           className="node-closed-text"
           type="button"

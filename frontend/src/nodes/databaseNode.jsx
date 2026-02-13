@@ -14,7 +14,11 @@ export const DatabaseNode = ({ id, data, selected }) => {
   const isSelected = selected || (selectedNodesStore || []).includes(id);
   const isDisplayOpen = data?.isDisplayOpen || false;
 
-  const { filterUI } = useFilterComponent({ id, data, updateNodeField });
+  const { filterUI, applyFilter } = useFilterComponent({ id, data, updateNodeField });
+
+  // Apply filter to results if they exist
+  const filteredResults = data?.results ? applyFilter(data.results) : '';
+
 
   const handleConnectionChange = (e) => {
     updateNodeField(id, 'connectionString', e.target.value);
@@ -139,8 +143,24 @@ export const DatabaseNode = ({ id, data, selected }) => {
           >
             {isLoading ? 'Executing...' : 'Execute Query'}
           </button>
+          {data?.results && (
+            <div>
+              <label htmlFor={`${id}-results`} className="block text-xs font-medium text-slate-300 mb-1">Results</label>
+              <textarea
+                id={`${id}-results`}
+                value={filteredResults || data?.results || ''}
+                readOnly
+                rows={5}
+                className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-vertical"
+                placeholder="Query results will appear here"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          )}
+          {filterUI}
         </div>
       ) : (
+
         <div className="node-closed-text">
           Click to configure
         </div>

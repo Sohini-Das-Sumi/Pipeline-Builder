@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
-
 import { Position } from 'reactflow';
 import { BaseNode } from './BaseNode';
+import { useStore } from '../store';
+import { useFilterComponent } from './FilterComponent';
+
 
 export const OutputNode = ({ id, data, selected }) => {
   const updateNodeField = useStore((state) => state.updateNodeField);
@@ -12,14 +14,28 @@ export const OutputNode = ({ id, data, selected }) => {
   const hasOutput = data?.outputValue && data.outputValue.trim() !== '';
   const isDisplayOpen = data?.isDisplayOpen || false;
 
+  const { filterUI, applyFilter } = useFilterComponent({
+    id,
+    data,
+    updateNodeField
+  });
+
+  // Apply filter to output value if it exists
+  const filteredOutput = data?.outputValue ? applyFilter(data.outputValue) : '';
+
   // Removed auto-opening on selection - displays stay closed by default
+
 
   const handleNameChange = (e) => {
     const newName = e.target.value;
     updateNodeField(id, 'outputName', newName);
   };
 
-  const handles = [{ type: 'target', id: 'value' }];
+  const handles = [
+    { type: 'target', id: 'value' },
+    { type: 'target', id: 'filter', position: Position.Top }
+  ];
+
 
 
   return (
@@ -54,16 +70,19 @@ export const OutputNode = ({ id, data, selected }) => {
             <label htmlFor={`${id}-outputValue`} className="block text-xs font-medium text-slate-300 mb-1">Output Value</label>
             <textarea
               id={`${id}-outputValue`}
-              value={data?.outputValue || data?.output || ''}
+              value={filteredOutput || data?.outputValue || data?.output || ''}
               readOnly
+
               className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-vertical"
               rows={3}
               placeholder="Output value will appear here"
               onClick={(e) => e.stopPropagation()}
             />
           </div>
+          {filterUI}
         </div>
       ) : (
+
         <button
           className="node-closed-text"
           type="button"

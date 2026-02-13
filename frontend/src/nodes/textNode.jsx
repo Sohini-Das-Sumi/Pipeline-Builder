@@ -18,7 +18,11 @@ export const TextNode = ({ id, data, selected }) => {
     updateNodeField
   });
 
+  // Apply filter to text content if enabled
+  const filteredText = data?.text ? applyFilter(data.text) : '';
+
   const handleTextChange = (e) => {
+
     const newText = e.target.value;
     updateNodeField(id, 'text', newText);
   };
@@ -82,7 +86,22 @@ export const TextNode = ({ id, data, selected }) => {
               onClick={(e) => e.stopPropagation()}
             />
           </div>
+          {data?.isFilterEnabled && filteredText !== data?.text && (
+            <div>
+              <label htmlFor={`${id}-filteredText`} className="block text-xs font-medium text-slate-300 mb-1">Filtered Output</label>
+              <textarea
+                id={`${id}-filteredText`}
+                value={filteredText}
+                readOnly
+                rows={3}
+                className="w-full px-2 py-1 bg-slate-800 border border-slate-600 rounded text-green-400 text-xs resize-vertical"
+                placeholder="Filtered text will appear here"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          )}
           {filterUI}
+
         </div>
       ) : (
         <div className="node-closed-text">

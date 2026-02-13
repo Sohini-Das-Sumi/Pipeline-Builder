@@ -612,12 +612,14 @@ export const StoreProvider = ({ children }) => {
 
   const deselectAllNodes = useCallback(async () => {
     getStateManager().deselectAll();
+    // Close all node displays and clear selection
     const updatedNodes = nodes.map(node => ({
       ...node,
       selected: false,
       data: {
         ...node.data,
-        selected: false
+        selected: false,
+        isDisplayOpen: false
       }
     }));
     setNodes(updatedNodes);
@@ -625,6 +627,7 @@ export const StoreProvider = ({ children }) => {
     setSelectedEdges(getStateManager().getSelectedEdges());
     schedulePersist();
   }, [nodes, schedulePersist]);
+
 
 
 

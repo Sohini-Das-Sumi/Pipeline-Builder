@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { getCustomNodes } from './nodes/CustomNodeLibrary';
 import { useStore } from './StoreContext.jsx';
 
+
 // Function to get text color class based on theme
 const getTextColorClass = (theme) => {
   return theme === 'light' ? 'text-gray-800' : 'text-white';
@@ -27,7 +28,15 @@ const getTailwindBgClass = (color) => {
 export const PipelineToolbar = ({ onNodeSelect, onCustomNodeCreated }) => {
   const [customNodes, setCustomNodes] = useState(getCustomNodes());
   const theme = useStore((state) => state.theme);
+  const deselectAllNodes = useStore((state) => state.deselectAllNodes);
   const textColorClass = getTextColorClass(theme);
+
+  const handleCloseAll = () => {
+    if (deselectAllNodes) {
+      deselectAllNodes();
+    }
+  };
+
 
   const onDragStart = (event, nodeType) => {
     event.dataTransfer.setData('application/reactflow', JSON.stringify({ nodeType }));
@@ -163,8 +172,21 @@ export const PipelineToolbar = ({ onNodeSelect, onCustomNodeCreated }) => {
         </span>
       </div>
 
+      {/* Close All Button */}
+      <div
+        className="w-4 h-4 rounded-full bg-gray-500 ring-2 ring-gray-400/20 ring-offset-2 ring-offset-transparent hover:w-auto hover:px-4 hover:py-2 hover:rounded-xl hover:bg-white/10 hover:border hover:border-white/10 hover:shadow-sm cursor-pointer flex items-center justify-center gap-2 transition-all duration-300"
+        onClick={handleCloseAll}
+        title="Close all nodes"
+      >
+        <span className={`${textColorClass} text-sm font-medium opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center gap-2`}>
+          <div className="w-2 h-2 rounded-full bg-gray-500"></div>
+          Close All
+        </span>
+      </div>
+
       {/* Custom Nodes */}
       {customNodes.map((customNode) => (
+
         <div
           key={customNode.id}
           className={`w-4 h-4 rounded-full ring-2 ring-gray-400/20 ring-offset-2 ring-offset-transparent hover:w-auto hover:px-4 hover:py-2 hover:rounded-xl hover:bg-white/10 hover:border hover:border-white/10 hover:shadow-sm cursor-grab active:cursor-grabbing flex items-center justify-center gap-2 transition-all duration-300 ${getTailwindBgClass(customNode.color)}`}

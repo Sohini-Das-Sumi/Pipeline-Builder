@@ -146,11 +146,26 @@ export class StateManager {
   deselectAll() {
     this.state.selectedNodes = [];
     this.state.selectedEdges = [];
-    // Update node instances' selected property
+    // Update node instances' selected property and close all displays
     this.pipeline.nodes.forEach(node => {
       node.setSelected(false);
+      // Close any open displays by updating node data
+      if (node.data) {
+        node.data.isDisplayOpen = false;
+        node.data.selected = false;
+      }
     });
   }
+
+  closeAllDisplays() {
+    // Close all node displays
+    this.pipeline.nodes.forEach(node => {
+      if (node.data) {
+        node.data.isDisplayOpen = false;
+      }
+    });
+  }
+
 
   deleteNode(nodeId) {
     this.pipeline.removeNode(nodeId);
