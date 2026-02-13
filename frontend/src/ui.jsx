@@ -53,7 +53,8 @@ export const PipelineUI = () => {
       theme,
       toggleTheme,
       isInteractive,
-      toggleInteractivity
+      toggleInteractivity,
+      setIsInteractiveState
     } = useStore();
     
 
@@ -155,6 +156,8 @@ export const PipelineUI = () => {
                 }}
                 onSelectionChange={onSelectionChange}
                 nodeTypes={nodeTypes}
+
+
                 proOptions={proOptions}
                 snapGrid={[gridSize, gridSize]}
                 connectionLineType='smoothstep'

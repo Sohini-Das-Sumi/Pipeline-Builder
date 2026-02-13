@@ -262,6 +262,10 @@ export const StoreProvider = ({ children }) => {
     setIsInteractive(!isInteractive);
   }, [isInteractive]);
 
+  const setIsInteractiveState = useCallback((value) => {
+    setIsInteractive(value);
+  }, []);
+
   const toggleZoomOnScroll = useCallback(() => {
     setZoomOnScroll(prev => !prev);
   }, []);
@@ -696,6 +700,7 @@ export const StoreProvider = ({ children }) => {
     toggleBackground,
     toggleTheme,
     toggleInteractivity,
+    setIsInteractiveState,
     toggleZoomOnScroll,
     toggleZoomOnPinch,
     toggleZoomOnDoubleClick,
