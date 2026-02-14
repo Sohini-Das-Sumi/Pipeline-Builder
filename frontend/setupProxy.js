@@ -1,6 +1,31 @@
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 module.exports = function(app) {
+  // Pipeline parse endpoint - forward to Node.js backend on port 5001
+  app.use(
+    '/pipelines',
+    createProxyMiddleware({
+      target: 'http://localhost:5001',
+      changeOrigin: true,
+      logLevel: 'debug',
+      timeout: 120000,
+      proxyTimeout: 120000,
+      onProxyReq: (proxyReq, req, res) => {
+        console.log('Proxying request to /pipelines:', req.url);
+        console.log('Proxy target: http://localhost:5001');
+      },
+      onError: (err, req, res) => {
+        console.error('Proxy error for /pipelines:', err);
+        if (!res.headersSent) {
+          res.status(503).json({
+            error: 'Backend service unavailable',
+            message: 'The backend server is not running or unreachable. Please ensure the backend is started.'
+          });
+        }
+      }
+    })
+  );
+
   // More specific routes must come before general ones
   app.use(
     '/api/llm',

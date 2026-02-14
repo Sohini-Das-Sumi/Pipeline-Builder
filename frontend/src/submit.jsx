@@ -40,14 +40,20 @@ export const SubmitButton = () => {
                     },
                     body: JSON.stringify({ nodes, edges }),
                 });
-                const parseData = await parseResponse.json();
-                console.log('Pipeline parse response:', parseData);
                 
-                // Show alert with the pipeline info
-                const isDagText = parseData.is_dag ? 'Yes' : 'No';
-                alert(`Pipeline Analysis:\n\nNodes: ${parseData.num_nodes}\nEdges: ${parseData.num_edges}\nIs DAG: ${isDagText}`);
+                if (!parseResponse.ok) {
+                    alert(`Error: Backend returned status ${parseResponse.status}. Please ensure the backend is running.`);
+                } else {
+                    const parseData = await parseResponse.json();
+                    console.log('Pipeline parse response:', parseData);
+                    
+                    // Show alert with the pipeline info
+                    const isDagText = parseData.is_dag ? 'Yes' : 'No';
+                    alert(`Pipeline Analysis:\n\nNodes: ${parseData.num_nodes}\nEdges: ${parseData.num_edges}\nIs DAG: ${isDagText}`);
+                }
             } catch (parseError) {
                 console.error('Error parsing pipeline:', parseError);
+                alert(`Error: Could not connect to backend. Please ensure the backend server is running.\n\nError details: ${parseError.message}`);
             }
 
             // Execute the pipeline locally

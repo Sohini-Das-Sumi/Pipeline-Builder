@@ -207,6 +207,73 @@ app.post('/api/tasks', (req, res) => {
   res.json(task);
 });
 
+// Pipeline parse endpoint
+app.post('/pipelines/parse', (req, res) => {
+  try {
+    const { nodes = [], edges = [] } = req.body || {};
+    const num_nodes = nodes.length;
+    const num_edges = edges.length;
+    
+    // Check if it's a DAG (Directed Acyclic Graph)
+    const isDag = checkIsDag(nodes, edges);
+    
+    res.json({
+      num_nodes,
+      num_edges,
+      is_dag: isDag
+    });
+  } catch (error) {
+    console.error('Error parsing pipeline:', error);
+    res.status(500).json({ detail: `Error parsing pipeline: ${error.message}` });
+  }
+});
+
+// Helper function to check if graph is a DAG
+function checkIsDag(nodes, edges) {
+  // Build adjacency list and in-degree map
+  const graph = {};
+  const inDegree = {};
+  
+  // Initialize
+  nodes.forEach(node => {
+    graph[node.id] = [];
+    inDegree[node.id] = 0;
+  });
+  
+  // Build graph
+  edges.forEach(edge => {
+    if (graph[edge.source] && graph[edge.target]) {
+      graph[edge.source].push(edge.target);
+      inDegree[edge.target] = (inDegree[edge.target] || 0) + 1;
+    }
+  });
+  
+  // Kahn's algorithm for topological sort
+  const queue = [];
+  Object.keys(inDegree).forEach(node => {
+    if (inDegree[node] === 0) {
+      queue.push(node);
+    }
+  });
+  
+  let visitedCount = 0;
+  while (queue.length > 0) {
+    const current = queue.shift();
+    visitedCount++;
+    
+    if (graph[current]) {
+      graph[current].forEach(neighbor => {
+        inDegree[neighbor]--;
+        if (inDegree[neighbor] === 0) {
+          queue.push(neighbor);
+        }
+      });
+    }
+  }
+  
+  return visitedCount === nodes.length;
+}
+
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
