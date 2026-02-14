@@ -9,12 +9,7 @@ export const NoteNode = ({ id, data, selected }) => {
   const selectedNodesStore = useStore((state) => state.selectedNodes);
   const isSelected = selected || (selectedNodesStore || []).includes(id);
   const isDisplayOpen = data?.isDisplayOpen || false;
-
-
-
-
-
-
+  const nodeData = { ...data, nodeType: 'note' };
 
   const handles = [
     { type: 'source', id: 'output' },
@@ -32,6 +27,7 @@ export const NoteNode = ({ id, data, selected }) => {
       isDisplayOpen={isDisplayOpen}
       updateNodeField={updateNodeField}
       nodeKey={`${id}-${isDisplayOpen}`}
+      data={nodeData}
     >
       {isDisplayOpen ? (
         <div className="space-y-3 p-3 max-w-xl min-h-[300px]">

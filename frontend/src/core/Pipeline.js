@@ -155,7 +155,26 @@ export class Pipeline {
             const result = await node.execute(inputs || {});
             const normalized = result || {};
             outputsByNode.set(node.id, normalized);
-            results.push({ nodeId: node.id, output: normalized.output, outputValue: normalized.outputValue });
+            
+            // Determine the source node type for output nodes
+            let sourceType = null;
+            if (node.type === 'customOutput' || node.type === 'output') {
+              // Find the incoming edge to get the source node type
+              const incomingEdges = this.edges.filter(e => e.target === node.id);
+              if (incomingEdges.length > 0) {
+                const sourceNode = this.nodes.find(n => n.id === incomingEdges[0].source);
+                if (sourceNode) {
+                  sourceType = sourceNode.type || sourceNode.data?.nodeType || 'Unknown';
+                }
+              }
+            }
+            
+            results.push({ 
+              nodeId: node.id, 
+              output: normalized.output, 
+              outputValue: normalized.outputValue,
+              sourceType: sourceType 
+            });
           } catch (err) {
             // On error, store the error message as output so it surfaces in the UI
             const msg = err && err.message ? `Error: ${err.message}` : 'Execution error';

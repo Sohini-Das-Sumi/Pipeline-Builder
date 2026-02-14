@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { createCustomNode, getCustomNodes } from './CustomNodeLibrary';
+import { BaseNode } from './BaseNode';
+import { Position } from 'reactflow';
 
 export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
   const [nodeConfig, setNodeConfig] = useState({
@@ -183,7 +185,7 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Basic Configuration */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-white mb-3">Basic Configuration</h3>
@@ -475,6 +477,138 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
               >
                 Add Field
               </button>
+            </div>
+          </div>
+
+          {/* Preview Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-white mb-3">Preview</h3>
+            
+            {/* Node Preview */}
+            <div className="bg-slate-900 p-4 rounded-lg">
+              <div className="flex flex-col items-center">
+                {/* Node Card */}
+                <div 
+                  className="w-48 rounded-lg shadow-lg overflow-hidden"
+                  style={{ backgroundColor: nodeConfig.color || '#f97316' }}
+                >
+                  {/* Node Header */}
+                  <div className="px-3 py-2 bg-black bg-opacity-20">
+                    <div className="text-white font-semibold text-sm text-center">
+                      {nodeConfig.title || 'Node Title'}
+                    </div>
+                  </div>
+                  
+                  {/* Node Body */}
+                  <div className="p-3 space-y-2 bg-slate-800">
+                    {nodeConfig.description && (
+                      <p className="text-slate-300 text-xs">{nodeConfig.description}</p>
+                    )}
+                    
+                    {/* Field Previews */}
+                    {nodeConfig.fields.length === 0 ? (
+                      <p className="text-slate-500 text-xs italic">No fields configured</p>
+                    ) : (
+                      nodeConfig.fields.map((field, index) => (
+                        <div key={index}>
+                          <label className="block text-xs text-slate-300 mb-1">
+                            {field.label}{field.required && <span className="text-red-400">*</span>}
+                          </label>
+                          {field.type === 'text' && (
+                            <input
+                              type="text"
+                              placeholder={field.placeholder || field.label}
+                              className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs"
+                              disabled
+                            />
+                          )}
+                          {field.type === 'textarea' && (
+                            <textarea
+                              rows={field.rows || 3}
+                              placeholder={field.placeholder || field.label}
+                              className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs"
+                              disabled
+                            />
+                          )}
+                          {field.type === 'number' && (
+                            <input
+                              type="number"
+                              min={field.min}
+                              max={field.max}
+                              step={field.step}
+                              placeholder={field.placeholder || field.label}
+                              className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs"
+                              disabled
+                            />
+                          )}
+                          {field.type === 'select' && (
+                            <select
+                              className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs"
+                              disabled
+                            >
+                              <option>{field.placeholder || 'Select...'}</option>
+                              {field.options && field.options.map((opt, i) => (
+                                <option key={i} value={opt.value}>{opt.label}</option>
+                              ))}
+                            </select>
+                          )}
+                          {field.helpText && (
+                            <p className="text-slate-400 text-xs mt-1">{field.helpText}</p>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Handles Preview */}
+                <div className="flex justify-between w-full mt-2 px-4">
+                  {/* Input Handles */}
+                  <div className="flex gap-1">
+                    {Array.from({ length: Math.max(0, nodeConfig.inputs) }).map((_, i) => (
+                      <div
+                        key={`input-${i}`}
+                        className="w-3 h-3 rounded-full bg-blue-500 border-2 border-slate-800"
+                        title={`Input ${i + 1}`}
+                      />
+                    ))}
+                  </div>
+                  
+                  {/* Output Handles */}
+                  <div className="flex gap-1">
+                    {Array.from({ length: Math.max(0, nodeConfig.outputs) }).map((_, i) => (
+                      <div
+                        key={`output-${i}`}
+                        className="w-3 h-3 rounded-full bg-green-500 border-2 border-slate-800"
+                        title={`Output ${i + 1}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Configuration Summary */}
+            <div className="bg-slate-700 p-3 rounded">
+              <h4 className="text-sm font-semibold text-white mb-2">Configuration Summary</h4>
+              <div className="space-y-1 text-xs text-slate-300">
+                <p><span className="text-slate-400">Node ID:</span> {nodeConfig.id || 'Not set'}</p>
+                <p><span className="text-slate-400">Title:</span> {nodeConfig.title || 'Not set'}</p>
+                <p><span className="text-slate-400">Fields:</span> {nodeConfig.fields.length}</p>
+                <p><span className="text-slate-400">Inputs:</span> {nodeConfig.inputs}</p>
+                <p><span className="text-slate-400">Outputs:</span> {nodeConfig.outputs}</p>
+              </div>
+            </div>
+
+            {/* Tips */}
+            <div className="bg-blue-900 bg-opacity-30 p-3 rounded border border-blue-700">
+              <h4 className="text-sm font-semibold text-blue-300 mb-1">Tips</h4>
+              <ul className="text-xs text-slate-300 space-y-1">
+                <li>• Fill in the Node ID and Title to get started</li>
+                <li>• Add fields to create configuration options</li>
+                <li>• Use the color picker to match your workflow</li>
+                <li>• Preview updates as you configure</li>
+              </ul>
             </div>
           </div>
         </div>

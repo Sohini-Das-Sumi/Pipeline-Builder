@@ -14,6 +14,8 @@ export const DatabaseNode = ({ id, data, selected }) => {
   const isSelected = selected || (selectedNodesStore || []).includes(id);
   const isDisplayOpen = data?.isDisplayOpen || false;
 
+  const nodeData = { ...data, nodeType: 'database' };
+
   const { filterUI, applyFilter } = useFilterComponent({ id, data, updateNodeField });
 
   // Apply filter to results if they exist
@@ -97,7 +99,7 @@ export const DatabaseNode = ({ id, data, selected }) => {
   ];
 
   return (
-    <BaseNode id={id} title="🗄️ Database" handles={handles} onClose={() => deleteNode(id)} className={`transition-transform duration-300 ${isSelected ? 'transform scale-105' : ''}`} isSelected={isSelected} isDisplayOpen={isDisplayOpen} updateNodeField={updateNodeField} nodeKey={`${id}-${isDisplayOpen}`}>
+    <BaseNode id={id} title="🗄️ Database" handles={handles} onClose={() => deleteNode(id)} className={`transition-transform duration-300 ${isSelected ? 'transform scale-105' : ''}`} isSelected={isSelected} isDisplayOpen={isDisplayOpen} updateNodeField={updateNodeField} nodeKey={`${id}-${isDisplayOpen}`} data={nodeData}>
       {isDisplayOpen ? (
         <div className="space-y-3 p-3 max-w-xl min-h-[300px]">
           <div className="flex items-center justify-between mb-2">

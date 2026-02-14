@@ -215,6 +215,7 @@ export const createCustomNode = (nodeConfig) => {
         isSelected={isSelected}
         isDisplayOpen={isDisplayOpen}
         updateNodeField={updateNodeField}
+        data={data}
       >
         {isDisplayOpen ? (
           <div className="space-y-3 p-3 max-w-xl min-h-[300px]">

@@ -25,6 +25,12 @@ export const CustomNodeManager = ({ id, data, selected }) => {
     { type: 'source', id: 'output' }
   ];
 
+  // Create nodeData with nodeType for output node to identify source
+  const nodeData = {
+    ...data,
+    nodeType: 'customNodeManager'
+  };
+
   const handleNodeCreated = (nodeInfo) => {
     // Refresh the list or notify user
     console.log('Custom node created:', nodeInfo);
@@ -186,6 +192,7 @@ export const CustomNodeManager = ({ id, data, selected }) => {
         isSelected={isSelected}
         isDisplayOpen={isDisplayOpen}
         updateNodeField={updateNodeField}
+        data={nodeData}
       >
         {isDisplayOpen ? (
           <div className="space-y-4 p-4 max-w-4xl min-h-[600px] overflow-y-auto">

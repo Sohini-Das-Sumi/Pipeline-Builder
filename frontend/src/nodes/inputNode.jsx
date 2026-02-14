@@ -18,7 +18,7 @@ export const InputNode = ({ id, data, selected }) => {
   const selectedNodesStore = useStore(state => state.selectedNodes);
 
 
-  const nodeData = { ...data };
+  const nodeData = { ...data, nodeType: 'input' };
 
   const { filterUI, applyFilter } = useFilterComponent({
     id,

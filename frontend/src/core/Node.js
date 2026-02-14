@@ -300,9 +300,50 @@ export class TextNode extends Node {
   }
 }
 
-export class DatabaseNode extends Node {
+export class DatabaseNode extends ApiNode {
   async execute(inputs = {}) {
-    return { output: this.data.results };
+    console.log(`DatabaseNode execute called for node ${this.id}`);
+    
+    // Get query from node data or inputs
+    const query = this.data.query || '';
+    const connectionString = this.data.connectionString || 'sqlite:///example.db';
+    
+    if (!query.trim()) {
+      const error = 'Error: No query provided';
+      this.updateField('output', error);
+      return { output: error };
+    }
+
+    console.log(`DatabaseNode executing query:`, { connectionString, query });
+
+    let result;
+    try {
+      result = await this.makeApiCall('/database/query', {
+        connection_string: connectionString,
+        query: query,
+      }, 60000);
+    } catch (error) {
+      result = { success: false, error: this.handleException(error) };
+    }
+
+    console.log(`DatabaseNode API result:`, result);
+
+    let output;
+    if (result.success) {
+      const formattedResults = JSON.stringify(result.data.data, null, 2);
+      output = formattedResults;
+      // Also store the results in the node data for the UI to display
+      this.updateField('results', formattedResults);
+      console.log(`DatabaseNode setting output to:`, output);
+    } else {
+      output = result.error;
+      console.log(`DatabaseNode setting error output to:`, output);
+    }
+
+    this.updateField('output', output);
+    this.updateField('_timestamp', Date.now());
+    console.log(`DatabaseNode execute completed, returning:`, { output });
+    return { output };
   }
 }
 
@@ -314,7 +355,127 @@ export class NoteNode extends Node {
 
 export class TimerNode extends Node {
   async execute(inputs = {}) {
-    return { output: this.data.interval };
+    const timerMode = this.data.timerMode || 'timeout';
+    const delay = parseInt(this.data.delay, 10) || 1000;
+    const unit = this.data.unit || 'ms';
+    const repeatCount = parseInt(this.data.repeatCount, 10) || 1;
+    const passThrough = this.data.passThrough || false;
+    const outputFormat = this.data.outputFormat || 'timestamp';
+    const customMessage = this.data.customMessage || 'Timer completed!';
+    const autoStart = this.data.autoStart !== false;
+
+    // Get input data for pass-through
+    const inputData = inputs.inputData || inputs.outputValue || '';
+
+    // Convert delay to milliseconds based on unit
+    const getDelayInMs = () => {
+      switch (unit) {
+        case 's':
+          return delay * 1000;
+        case 'm':
+          return delay * 60000;
+        case 'ms':
+        default:
+          return delay;
+      }
+    };
+
+    const delayInMs = getDelayInMs();
+
+    // Handle different timer modes
+    switch (timerMode) {
+      case 'stopwatch':
+        return this.executeStopwatch(outputFormat, customMessage, inputData, passThrough);
+      
+      case 'interval':
+        return this.executeInterval(delayInMs, repeatCount, outputFormat, customMessage, inputData, passThrough);
+      
+      case 'timeout':
+      default:
+        return this.executeTimeout(delayInMs, outputFormat, customMessage, inputData, passThrough);
+    }
+  }
+
+  // Execute timeout (single delay)
+  executeTimeout(delayInMs, outputFormat, customMessage, inputData, passThrough) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const output = this.formatOutput(outputFormat, customMessage, delayInMs, inputData, passThrough);
+        this.updateField('output', output);
+        this.updateField('_timestamp', Date.now());
+        resolve({ output, delay: delayInMs });
+      }, delayInMs);
+    });
+  }
+
+  // Execute interval (repeating)
+  executeInterval(delayInMs, repeatCount, outputFormat, customMessage, inputData, passThrough) {
+    return new Promise((resolve) => {
+      let count = 0;
+      const maxCount = repeatCount === 0 ? Infinity : repeatCount;
+      const outputs = [];
+
+      const executeTick = () => {
+        count++;
+        const output = this.formatOutput(outputFormat, customMessage, delayInMs, inputData, passThrough, count);
+        outputs.push(output);
+        this.updateField('output', output);
+        this.updateField('_timestamp', Date.now());
+
+        if (count < maxCount) {
+          setTimeout(executeTick, delayInMs);
+        } else {
+          resolve({ output: outputs.join('\n'), outputs, count, delay: delayInMs });
+        }
+      };
+
+      // Start first interval
+      setTimeout(executeTick, delayInMs);
+    });
+  }
+
+  // Execute stopwatch mode
+  executeStopwatch(outputFormat, customMessage, inputData, passThrough) {
+    // For stopwatch, we return the elapsed time from node data or current timestamp
+    const elapsed = this.data.stopwatchElapsed || 0;
+    const startTime = this.data.stopwatchStartTime || Date.now();
+    const isRunning = this.data.stopwatchRunning || false;
+
+    let output;
+    if (isRunning) {
+      // If stopwatch is running, calculate current elapsed time
+      const currentElapsed = Date.now() - startTime;
+      output = this.formatOutput(outputFormat, customMessage, currentElapsed, inputData, passThrough);
+    } else {
+      output = this.formatOutput(outputFormat, customMessage, elapsed, inputData, passThrough);
+    }
+
+    this.updateField('output', output);
+    this.updateField('_timestamp', Date.now());
+    return { output, elapsed: isRunning ? (Date.now() - startTime) : elapsed, isRunning };
+  }
+
+  // Format output based on selected format
+  formatOutput(outputFormat, customMessage, timeValue, inputData, passThrough, count = null) {
+    switch (outputFormat) {
+      case 'countdown':
+        return `Countdown: ${timeValue}ms${count ? ` (${count})` : ''}`;
+      
+      case 'passthrough':
+        return passThrough ? inputData : 'No input to pass through';
+      
+      case 'message':
+        return count 
+          ? `${customMessage} (${count})` 
+          : customMessage;
+      
+      case 'elapsed':
+        return String(timeValue);
+      
+      case 'timestamp':
+      default:
+        return `Timestamp: ${Date.now()}, Delay: ${timeValue}ms${count ? `, Count: ${count}` : ''}`;
+    }
   }
 }
 

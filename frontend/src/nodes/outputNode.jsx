@@ -16,7 +16,11 @@ export const OutputNode = ({ id, data, selected }) => {
   // Find the source node connected to this output node's "value" handle
   const connectedEdge = edges.find(edge => edge.target === id && edge.targetHandle === 'value');
   const sourceNode = connectedEdge ? nodes.find(n => n.id === connectedEdge.source) : null;
-  const outputType = sourceNode?.data?.nodeType || sourceNode?.type || 'Unknown';
+  
+  // First try to get the type from the connected source node
+  // Then fall back to sourceType which is set during pipeline execution
+  // Finally, try the node's type property
+  const outputType = sourceNode?.data?.nodeType || sourceNode?.type || data?.sourceType || 'Unknown';
 
   const hasOutput = data?.outputValue && data.outputValue.trim() !== '';
   const isDisplayOpen = data?.isDisplayOpen || false;
@@ -43,7 +47,11 @@ export const OutputNode = ({ id, data, selected }) => {
     { type: 'target', id: 'filter', position: Position.Top }
   ];
 
-
+  // Create nodeData with nodeType for output node to identify source
+  const nodeData = {
+    ...data,
+    nodeType: 'output'
+  };
 
   return (
     <div key={`${id}-${data?._timestamp || ''}-${data?.output || data?.outputValue || ''}-${isDisplayOpen}`}>
@@ -57,6 +65,7 @@ export const OutputNode = ({ id, data, selected }) => {
         isDisplayOpen={isDisplayOpen}
         updateNodeField={updateNodeField}
         nodeKey={`${id}-${isDisplayOpen}`}
+        data={nodeData}
 
       >
       {isDisplayOpen ? (

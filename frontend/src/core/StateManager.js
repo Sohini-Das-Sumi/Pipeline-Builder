@@ -277,14 +277,8 @@ export class StateManager {
                 selected: false,
               }
             };
-            // Fix outputName for output nodes to prevent "1s" sequences
-            if (node.type === 'customOutput' && node.data?.outputName) {
-              const idNumber = parseInt((node.id || '').split('-')[1], 10) || 1;
-              validatedNode.data = {
-                ...validatedNode.data,
-                outputName: `output_${idNumber}`
-              };
-            }
+            // Keep the existing outputName as-is - do not overwrite with generated name
+            // This allows users to set custom output names that persist across sessions
             // Clear old output for LLM nodes to prevent auto-opening displays on page refresh
             if (node.type === 'llm') {
               validatedNode.data = {
@@ -365,6 +359,10 @@ export class StateManager {
         // For output nodes, set outputValue field; for other nodes, set output field
         if (node.type === 'customOutput' || node.type === 'output') {
           node.updateField('outputValue', result.output);
+          // Set the sourceType if provided from pipeline execution
+          if (result.sourceType) {
+            node.updateField('sourceType', result.sourceType);
+          }
         } else {
           node.updateField('output', result.output);
         }

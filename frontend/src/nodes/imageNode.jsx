@@ -16,6 +16,8 @@ export const ImageNode = ({ id, data, selected }) => {
   const [recognitionResult, setRecognitionResult] = useState('');
   const [isRecognizing, setIsRecognizing] = useState(false);
 
+  const nodeData = { ...data, nodeType: 'image' };
+
   // Removed auto-opening on selection - displays stay closed by default
 
   const handleFileChange = (e) => {
@@ -127,6 +129,7 @@ export const ImageNode = ({ id, data, selected }) => {
       isDisplayOpen={isDisplayOpen}
       updateNodeField={updateNodeField}
       nodeKey={`${id}-${isDisplayOpen}`}
+      data={nodeData}
     >
       {isDisplayOpen ? (
         <div className="space-y-3 p-3">

@@ -33,6 +33,12 @@ export const FilterNode = ({ id, data, selected }) => {
     { type: 'source', id: 'filtered' },
   ];
 
+  // Create nodeData with nodeType for output node to identify source
+  const nodeData = {
+    ...data,
+    nodeType: 'filter'
+  };
+
   return (
     <BaseNode
       id={id}
@@ -44,6 +50,7 @@ export const FilterNode = ({ id, data, selected }) => {
       isDisplayOpen={isDisplayOpen}
       updateNodeField={updateNodeField}
       nodeKey={`${id}-${isDisplayOpen}`}
+      data={nodeData}
     >
       {isDisplayOpen ? (
         <div className="space-y-3 p-3 min-h-[200px]">

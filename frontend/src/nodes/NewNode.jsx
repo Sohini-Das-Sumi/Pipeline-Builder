@@ -65,7 +65,7 @@ export const NewNode = ({ id, data, selected }) => {
   }
 
   return (
-    <BaseNode id={id} title="🆕 New" handles={handles} onClick={handleNodeClick} onClose={() => deleteNode(id)} className={`${isSelected ? 'transform scale-105 transition-all duration-500' : ''}`}>
+    <BaseNode id={id} title="🆕 New" handles={handles} onClick={handleNodeClick} onClose={() => deleteNode(id)} className={`${isSelected ? 'transform scale-105 transition-all duration-500' : ''}`} data={data}>
       <div className={`node-font-size-12 ${(data?.isVisible && !data?.isAnimating) ? 'transform scale-y-100 opacity-100 transition-all duration-500 origin-top' : 'transform scale-y-0 opacity-0 transition-all duration-500 origin-top'}`}>
         <label className="node-display-block">
           <label htmlFor={`${id}-content`}>Content:</label>
