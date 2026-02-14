@@ -28,14 +28,15 @@ const getTailwindBgClass = (color) => {
 export const PipelineToolbar = ({ onNodeSelect, onCustomNodeCreated }) => {
   const [customNodes, setCustomNodes] = useState(getCustomNodes());
   const theme = useStore((state) => state.theme);
-  const deselectAllNodes = useStore((state) => state.deselectAllNodes);
+  const clearAllNodes = useStore((state) => state.clearAllNodes);
   const textColorClass = getTextColorClass(theme);
 
   const handleCloseAll = () => {
-    if (deselectAllNodes) {
-      deselectAllNodes();
+    if (clearAllNodes) {
+      clearAllNodes();
     }
   };
+
 
 
   const onDragStart = (event, nodeType) => {

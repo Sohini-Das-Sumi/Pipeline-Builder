@@ -31,21 +31,19 @@ export const BaseNode = ({ id, title, handles, typeColor, onClick, onClose, extr
     }
   };
 
+  // Check if this is CustomNodeManager (has explicit displayWidth/displayHeight)
+  const isCustomNodeManager = data?.displayWidth && data?.displayHeight;
+
   return (
     <div
       key={nodeKey || id}
-      className={`node-container react-flow__node-default backdrop-blur-sm shadow-xl rounded-xl hover:shadow-2xl hover:border-indigo-300 ${isSelected ? 'node-selected' : ''} z-[100] ${className} node-container-base ${isDisplayOpen ? 'node-display-open' : 'node-display-closed'}`}
-      style={{
-        width: isDisplayOpen 
-          ? (data?.displayWidth ? `${data.displayWidth}px` : '600px')
-          : '400px',
-        height: isDisplayOpen
-          ? (data?.displayHeight ? `${data.displayHeight}px` : '350px')
-          : '150px',
+      className={`node-container react-flow__node-default min-w-[350px] backdrop-blur-sm shadow-xl rounded-xl hover:shadow-2xl hover:border-indigo-300 ${isSelected ? 'node-selected' : ''} z-[100] ${className}`}
+      style={isCustomNodeManager ? {
+        width: `${data.displayWidth}px`,
+        height: `${data.displayHeight}px`,
         maxWidth: '95vw',
         maxHeight: '90vh'
-      }}
-      onMouseEnter={() => {}}
+      } : undefined}
       onClick={handleNodeClick}
       onTransitionEnd={(e) => {
         // Only trigger onTransitionEnd for transform transitions
@@ -59,17 +57,32 @@ export const BaseNode = ({ id, title, handles, typeColor, onClick, onClose, extr
       {/* Colorful Accent Bar at the top */}
       <div className={`h-1.5 w-full ${typeColor || 'bg-indigo-500'}`} />
 
-      <div className="px-4 py-2 flex items-center justify-between border-b node-header">
+      {/* Header */}
+      <div
+        className="px-4 py-2 flex items-center justify-between border-b"
+        style={{
+          backgroundColor: 'var(--node-header-bg)',
+          borderColor: 'var(--node-header-border)',
+          color: 'var(--node-header-color)'
+        }}
+      >
         <span className="text-[11px] font-bold uppercase tracking-wider">{title}</span>
         <div className="flex items-center gap-2">
           {extraButton}
           {onClose && (
+
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onClose();
               }}
-              className="w-5 h-5 rounded-full flex items-center justify-center node-close-button"
+              className="w-5 h-5 rounded-full flex items-center justify-center transition-colors"
+              style={{
+                backgroundColor: 'var(--node-button-bg)',
+                border: '1px solid var(--node-button-border)'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--node-button-hover)'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--node-button-bg)'}
             >
               <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M1 1L9 9M9 1L1 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -79,26 +92,35 @@ export const BaseNode = ({ id, title, handles, typeColor, onClick, onClose, extr
         </div>
       </div>
 
+      {/* Content */}
       {children}
 
+      {/* Handles */}
       {handles.map((h, idx) => (
         <div key={`${id}-${h.id}-wrapper`} className="relative">
           <Handle
             type={h.type}
             position={h.position || (h.type === 'target' ? Position.Left : Position.Right)}
             id={`${id}-${h.id}`}
-            className="connection-handle node-handle"
+            className="connection-handle"
             onMouseEnter={() => setHoveredHandle(`${id}-${h.id}`)}
             onMouseLeave={() => setHoveredHandle(null)}
-            style={h.style}
+            style={{
+              background: '#000',
+              border: '2px solid #6366f1',
+              width: '10px',
+              height: '10px',
+              ...h.style
+            }}
           />
           {hoveredHandle === `${id}-${h.id}` && (
-            <div className={`node-handle-tooltip ${
-              h.position === Position.Top ? 'node-handle-tooltip-top' : 
-              h.position === Position.Bottom ? 'node-handle-tooltip-bottom' : 
-              h.position === Position.Left ? 'node-handle-tooltip-left' : 
-              'node-handle-tooltip-right'
-            }`}>
+            <div className="absolute z-50 bg-slate-800 text-white text-xs px-2 py-1 rounded shadow-lg border border-slate-600 whitespace-nowrap pointer-events-none"
+                 style={{
+                   top: h.position === Position.Top ? '20px' : h.position === Position.Bottom ? '-30px' : '50%',
+                   left: h.position === Position.Left ? '20px' : h.position === Position.Right ? '-150px' : '50%',
+                   transform: h.position === Position.Top || h.position === Position.Bottom ? 'translateX(-50%)' : 'translateY(-50%)',
+                   minWidth: '140px'
+                 }}>
               <div className="font-semibold mb-1">
                 {h.type === 'target' ? '📥 Input Connection' : '📤 Output Connection'}
               </div>

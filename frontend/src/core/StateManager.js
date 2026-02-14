@@ -169,8 +169,17 @@ export class StateManager {
     });
   }
 
+  clearAllNodes() {
+    // Clear all nodes and edges from the pipeline
+    this.pipeline.nodes = [];
+    this.pipeline.edges = [];
+    this.pipeline.buildNodeMap();
+    this.state.selectedNodes = [];
+    this.state.selectedEdges = [];
+  }
 
   deleteNode(nodeId) {
+
     this.pipeline.removeNode(nodeId);
     this.state.selectedNodes = this.state.selectedNodes.filter(id => id !== nodeId);
     this.state.selectedEdges = this.state.selectedEdges.filter(edgeId => {

@@ -219,7 +219,8 @@ export const createCustomNode = (nodeConfig) => {
         data={data}
       >
         {isDisplayOpen ? (
-          <div className="space-y-3 p-3 max-w-xl min-h-[300px]">
+          <div className="space-y-3 p-3 max-w-xl">
+
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-slate-300">{nodeConfig.title} Configuration</span>
               <button

@@ -658,6 +658,17 @@ export const StoreProvider = ({ children }) => {
     schedulePersist();
   }, [nodes, schedulePersist]);
 
+  const clearAllNodes = useCallback(async () => {
+    // Remove all nodes and edges from the canvas
+    getStateManager().clearAllNodes();
+    setNodes([]);
+    setEdges([]);
+    setSelectedNodes([]);
+    setSelectedEdges([]);
+    schedulePersist();
+  }, [schedulePersist]);
+
+
 
 
 
@@ -745,7 +756,9 @@ export const StoreProvider = ({ children }) => {
     onSelectionChange,
     selectNode,
     deselectAllNodes,
+    clearAllNodes,
     updateNodeField,
+
     deleteNode,
     arrangeAllDisplays: () => {
       try {
