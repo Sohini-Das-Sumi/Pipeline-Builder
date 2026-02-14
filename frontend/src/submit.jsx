@@ -31,6 +31,25 @@ export const SubmitButton = () => {
             console.log('Available nodes:', nodes.map(n => ({ id: n.id, type: n.type })));
             console.log('Available edges:', edges);
 
+            // Call the /pipelines/parse endpoint to get pipeline info
+            try {
+                const parseResponse = await fetch('/pipelines/parse', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ nodes, edges }),
+                });
+                const parseData = await parseResponse.json();
+                console.log('Pipeline parse response:', parseData);
+                
+                // Show alert with the pipeline info
+                const isDagText = parseData.is_dag ? 'Yes' : 'No';
+                alert(`Pipeline Analysis:\n\nNodes: ${parseData.num_nodes}\nEdges: ${parseData.num_edges}\nIs DAG: ${isDagText}`);
+            } catch (parseError) {
+                console.error('Error parsing pipeline:', parseError);
+            }
+
             // Execute the pipeline locally
             const result = await executePipeline(inputValue);
             console.log('executePipeline completed with result:', result);

@@ -9,7 +9,14 @@ export const OutputNode = ({ id, data, selected }) => {
   const updateNodeField = useStore((state) => state.updateNodeField);
   const deleteNode = useStore((state) => state.deleteNode);
   const selectedNodesStore = useStore((state) => state.selectedNodes);
+  const edges = useStore((state) => state.edges);
+  const nodes = useStore((state) => state.nodes);
   const isSelected = selected || (selectedNodesStore || []).includes(id);
+
+  // Find the source node connected to this output node's "value" handle
+  const connectedEdge = edges.find(edge => edge.target === id && edge.targetHandle === 'value');
+  const sourceNode = connectedEdge ? nodes.find(n => n.id === connectedEdge.source) : null;
+  const outputType = sourceNode?.data?.nodeType || sourceNode?.type || 'Unknown';
 
   const hasOutput = data?.outputValue && data.outputValue.trim() !== '';
   const isDisplayOpen = data?.isDisplayOpen || false;
@@ -63,6 +70,18 @@ export const OutputNode = ({ id, data, selected }) => {
               onChange={handleNameChange}
               className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
               placeholder="Enter output name"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+          <div>
+            <label htmlFor={`${id}-outputType`} className="block text-xs font-medium text-slate-300 mb-1">Output Type</label>
+            <input
+              id={`${id}-outputType`}
+              type="text"
+              value={outputType}
+              readOnly
+              className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              placeholder="No source connected"
               onClick={(e) => e.stopPropagation()}
             />
           </div>

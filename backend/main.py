@@ -172,8 +172,9 @@ async def parse_pipeline(request: Request):
     nodes = payload.get('nodes', [])
     edges = payload.get('edges', [])
     num_nodes = len(nodes)
+    num_edges = len(edges)
     dag = is_dag(nodes, edges)
-    return {'num_nodes': num_nodes, 'is_dag': dag}
+    return {'num_nodes': num_nodes, 'num_edges': num_edges, 'is_dag': dag}
 
 @app.post('/api/llm')
 async def api_llm_generate(request: Request):
