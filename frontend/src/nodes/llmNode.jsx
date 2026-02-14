@@ -104,18 +104,6 @@ export default function LLMNode({ id, data, selected }) {
     }
   };
 
-  const textareaStyle = {
-    width: '100%',
-    padding: '8px 12px',
-    boxSizing: 'border-box',
-    background: '#374151',
-    border: '1px solid #4b5563',
-    borderRadius: '6px',
-    color: '#ffffff',
-    fontSize: '12px',
-    resize: 'vertical',
-    minHeight: '60px',
-  };
 
   const handles = [
     { type: 'target', id: 'system' },
@@ -188,11 +176,11 @@ export default function LLMNode({ id, data, selected }) {
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, 'systemPrompt')}
                 rows={3}
-                style={textareaStyle}
+                className="node-textarea-dark resize-vertical"
                 placeholder="Enter system prompt or drag text/files here"
                 onClick={(e) => e.stopPropagation()}
-                className="focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
+
             </div>
             <div>
               <label htmlFor={`${id}-userPrompt`} className="block text-xs font-medium text-slate-300 mb-1">User Prompt</label>
@@ -203,11 +191,11 @@ export default function LLMNode({ id, data, selected }) {
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, 'userPrompt')}
                 rows={5}
-                style={textareaStyle}
-                className="focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="node-textarea-dark resize-vertical"
                 placeholder="Enter user prompt or drag text/files here"
                 onClick={(e) => e.stopPropagation()}
               />
+
             </div>
             {/* Output Area - This displays the LLM response after pipeline execution */}
             <div>
@@ -218,11 +206,11 @@ export default function LLMNode({ id, data, selected }) {
                 readOnly
                 rows={5}
                 value={filteredOutput || output}
-                style={textareaStyle}
+                className="node-textarea-dark resize-vertical"
                 placeholder="LLM response will appear here"
                 onClick={(e) => e.stopPropagation()}
-                className="focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
+
             </div>
             {filterUI}
         </div>

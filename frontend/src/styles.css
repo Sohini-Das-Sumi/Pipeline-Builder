@@ -131,26 +131,45 @@
 /* timerNode.js styles */
 .node-input-style {
   width: 100%;
-  padding: 8px 12px;
+  padding: 10px 14px;
   box-sizing: border-box;
   background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  color: #334155;
-  font-size: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.node-input-style:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  background-color: #ffffff;
 }
 
 .node-select-style {
   width: 100%;
-  padding: 8px 12px;
+  padding: 10px 14px;
   box-sizing: border-box;
   background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  color: #334155;
-  font-size: 12px;
-  height: 36px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 500;
+  height: 44px;
+  transition: all 0.2s ease-in-out;
 }
+
+.node-select-style:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  background-color: #ffffff;
+}
+
 
 .node-closed-text {
   text-align: center;
@@ -197,3 +216,174 @@
 /* Removed fixed sizes to allow dynamic sizing from arrangeDisplays function */
 /* The node sizes are now controlled by the arrangeDisplays function in StoreContext.jsx */
 /* which calculates sizes based on canvas bounds and number of nodes in the 3x3 grid */
+
+/* Dark theme textarea - dark text on light background for beautiful styling */
+.node-textarea-dark {
+  width: 100%;
+  padding: 10px 14px;
+  box-sizing: border-box;
+  background-color: #f8fafc !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 8px;
+  color: #1e293b !important;
+  font-size: 14px;
+  font-weight: 500;
+  resize: vertical;
+  min-height: 60px;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.node-textarea-dark::placeholder {
+  color: #94a3b8 !important;
+  font-weight: 400;
+}
+
+.node-textarea-dark:hover {
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.node-textarea-dark:focus {
+  outline: none;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff !important;
+}
+
+
+/* Read-only textarea variant for dark theme */
+.node-textarea-dark-readonly {
+  background-color: #1f2937 !important;
+  color: #e5e7eb !important;
+  border: 1px solid #374151 !important;
+}
+
+/* Input style for dark theme */
+.node-input-dark {
+  width: 100%;
+  padding: 8px 12px;
+  box-sizing: border-box;
+  background-color: #374151 !important;
+  border: 1px solid #4b5563 !important;
+  border-radius: 6px;
+  color: #ffffff !important;
+  font-size: 12px;
+}
+
+.node-input-dark::placeholder {
+  color: #9ca3af !important;
+}
+
+.node-input-dark:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+/* Node container base styles */
+.node-container-base {
+  visibility: visible;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Node display open state */
+.node-display-open {
+  min-width: 200px;
+  min-height: 150px;
+  max-width: 100%;
+  max-height: 100%;
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+/* Node display closed state */
+.node-display-closed {
+  width: 400px;
+  height: 150px;
+}
+
+/* Node header styles */
+.node-header {
+  background-color: var(--node-header-bg);
+  border-color: var(--node-header-border);
+  color: var(--node-header-color);
+}
+
+/* Node close button */
+.node-close-button {
+  background-color: var(--node-button-bg);
+  border: 1px solid var(--node-button-border);
+  color: var(--node-header-color);
+  transition: background-color 0.2s ease;
+}
+
+.node-close-button:hover {
+  background-color: var(--node-button-hover);
+}
+
+/* Connection handle styles */
+.node-handle {
+  background: #000;
+  border: 2px solid #6366f1;
+  width: 10px;
+  height: 10px;
+}
+
+/* Handle tooltip positioning */
+.node-handle-tooltip {
+  position: absolute;
+  z-index: 50;
+  background: rgb(30 41 59);
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  border: 1px solid rgb(71 85 105);
+  white-space: nowrap;
+  pointer-events: none;
+  min-width: 140px;
+}
+
+.node-handle-tooltip-top {
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.node-handle-tooltip-bottom {
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.node-handle-tooltip-left {
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+}
+
+.node-handle-tooltip-right {
+  top: 50%;
+  left: -150px;
+  transform: translateY(-50%);
+}
+
+/* Cursor pointer utility */
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Color picker button */
+.color-picker-button {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: inherit;
+  cursor: pointer;
+}
+
+/* Node color background */
+.node-color-bg {
+  background-color: var(--node-color);
+}

@@ -91,19 +91,6 @@ export const TextNode = ({ id, data, selected }) => {
     updateNodeField(id, 'text', newText);
   };
 
-  const textareaStyle = {
-    marginLeft: 6,
-    width: '100%',
-    padding: '8px 12px',
-    boxSizing: 'border-box',
-    background: 'linear-gradient(45deg, #ffecd2, #fcb69f)',
-    border: 'none',
-    borderRadius: '8px',
-    color: '#333',
-    fontSize: '12px',
-    resize: 'vertical',
-    boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
-  };
 
   // Create nodeData with nodeType for output node to identify source
   const nodeData = {
@@ -144,12 +131,12 @@ export const TextNode = ({ id, data, selected }) => {
               id={`${id}-text`}
               value={data?.text || ''}
               onChange={handleTextChange}
-              rows={3}
-              style={textareaStyle}
-              className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-vertical"
+              rows={8}
+              className="node-textarea-dark resize-y"
               placeholder="Enter text content. Use {{variableName}} to create variable handles for connecting other nodes."
               onClick={(e) => e.stopPropagation()}
             />
+
           </div>
           
           {/* Display detected variables info */}
@@ -177,10 +164,11 @@ export const TextNode = ({ id, data, selected }) => {
                 value={filteredText}
                 readOnly
                 rows={3}
-                className="w-full px-2 py-1 bg-slate-800 border border-slate-600 rounded text-green-400 text-xs resize-vertical"
+                className="node-textarea-dark resize-vertical"
                 placeholder="Filtered text will appear here"
                 onClick={(e) => e.stopPropagation()}
               />
+
             </div>
           )}
           {filterUI}

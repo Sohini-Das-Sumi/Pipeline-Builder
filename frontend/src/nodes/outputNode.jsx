@@ -100,12 +100,12 @@ export const OutputNode = ({ id, data, selected }) => {
               id={`${id}-outputValue`}
               value={filteredOutput || data?.outputValue || data?.output || ''}
               readOnly
-
-              className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-vertical"
+              className="node-textarea-dark resize-vertical"
               rows={3}
               placeholder="Output value will appear here"
               onClick={(e) => e.stopPropagation()}
             />
+
           </div>
           {filterUI}
         </div>

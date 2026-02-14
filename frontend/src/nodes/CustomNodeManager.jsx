@@ -28,7 +28,9 @@ export const CustomNodeManager = ({ id, data, selected }) => {
   // Create nodeData with nodeType for output node to identify source
   const nodeData = {
     ...data,
-    nodeType: 'customNodeManager'
+    nodeType: 'customNodeManager',
+    displayWidth: 600,
+    displayHeight: 350
   };
 
   const handleNodeCreated = (nodeInfo) => {
@@ -82,12 +84,12 @@ export const CustomNodeManager = ({ id, data, selected }) => {
   };
 
   const renderCreateTab = () => (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-white">Create New Custom Node</h3>
-      <p className="text-slate-400">Click the button below to open the custom node creator.</p>
+    <div className="space-y-3">
+      <h3 className="text-base font-semibold text-white">Create New Custom Node</h3>
+      <p className="text-slate-400 text-sm">Click the button below to open the custom node creator.</p>
       <button
         onClick={() => setShowCreator(true)}
-        className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
+        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm"
       >
         Open Node Creator
       </button>
@@ -95,37 +97,40 @@ export const CustomNodeManager = ({ id, data, selected }) => {
   );
 
   const renderManageTab = () => (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-white">Manage Custom Nodes</h3>
+    <div className="space-y-3">
+      <h3 className="text-base font-semibold text-white">Manage Custom Nodes</h3>
       {customNodes.length === 0 ? (
-        <p className="text-slate-400">No custom nodes created yet. Switch to the "Create" tab to add some.</p>
+        <p className="text-slate-400 text-sm">No custom nodes created yet. Switch to the "Create" tab to add some.</p>
       ) : (
-        <div className="space-y-3 max-h-96 overflow-y-auto">
+        <div className="space-y-2 max-h-[200px] overflow-y-auto">
           {customNodes.map((node) => (
-            <div key={node.id} className="bg-slate-700 p-4 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
+            <div key={node.id} className="bg-slate-700 p-3 rounded-lg">
+              <div className="flex items-center justify-between mb-1">
                 <div>
-                  <h4 className="text-white font-medium">{node.title}</h4>
-                  <p className="text-slate-400 text-sm">ID: {node.id}</p>
+                  <h4 className="text-white font-medium text-sm">{node.title}</h4>
+                  <p className="text-slate-400 text-xs">ID: {node.id}</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-1">
                   <button
                     onClick={() => handleDuplicateNode(node)}
-                    className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded"
+                    className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-[10px] rounded"
+                    title="Duplicate"
                   >
-                    Duplicate
+                    Copy
                   </button>
                   <button
                     onClick={() => handleExportNode(node)}
-                    className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded"
+                    className="px-2 py-1 bg-green-600 hover:bg-green-700 text-white text-[10px] rounded"
+                    title="Export"
                   >
                     Export
                   </button>
                   <button
                     onClick={() => handleRemoveNode(node.id)}
-                    className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded"
+                    className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-[10px] rounded"
+                    title="Delete"
                   >
-                    Remove
+                    Delete
                   </button>
                 </div>
               </div>
@@ -141,27 +146,27 @@ export const CustomNodeManager = ({ id, data, selected }) => {
   );
 
   const renderExportTab = () => (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-white">Import/Export Custom Nodes</h3>
+    <div className="space-y-3">
+      <h3 className="text-base font-semibold text-white">Import/Export</h3>
 
       <div>
-        <h4 className="text-white font-medium mb-2">Import Node Configuration</h4>
+        <h4 className="text-white font-medium mb-1 text-sm">Import Configuration</h4>
         <textarea
           value={importData}
           onChange={(e) => setImportData(e.target.value)}
-          placeholder="Paste JSON configuration here..."
-          className="w-full h-32 px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+          placeholder="Paste JSON here..."
+          className="w-full h-24 px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none text-sm"
         />
         <button
           onClick={handleImportNode}
-          className="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
+          className="mt-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm"
         >
-          Import Node
+          Import
         </button>
       </div>
 
       <div>
-        <h4 className="text-white font-medium mb-2">Export All Nodes</h4>
+        <h4 className="text-white font-medium mb-1 text-sm">Export All</h4>
         <button
           onClick={() => {
             const allConfigs = customNodes;
@@ -172,7 +177,7 @@ export const CustomNodeManager = ({ id, data, selected }) => {
             linkElement.setAttribute('download', 'all_custom_nodes_config.json');
             linkElement.click();
           }}
-          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded"
+          className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded text-sm"
         >
           Export All
         </button>
@@ -195,7 +200,7 @@ export const CustomNodeManager = ({ id, data, selected }) => {
         data={nodeData}
       >
         {isDisplayOpen ? (
-          <div className="space-y-4 p-4 max-w-4xl min-h-[600px] overflow-y-auto">
+          <div className="space-y-3 p-3 w-full h-full overflow-hidden flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <span className="text-lg font-medium text-slate-300">Custom Node Manager</span>
               <button
@@ -207,7 +212,7 @@ export const CustomNodeManager = ({ id, data, selected }) => {
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b border-slate-600 mb-4">
+            <div className="flex border-b border-slate-600 mb-2 flex-shrink-0">
               <button
                 onClick={() => setActiveTab('create')}
                 className={`px-4 py-2 text-sm font-medium ${activeTab === 'create' ? 'text-white border-b-2 border-blue-500' : 'text-slate-400 hover:text-white'}`}
@@ -229,9 +234,11 @@ export const CustomNodeManager = ({ id, data, selected }) => {
             </div>
 
             {/* Tab Content */}
-            {activeTab === 'create' && renderCreateTab()}
-            {activeTab === 'manage' && renderManageTab()}
-            {activeTab === 'export' && renderExportTab()}
+            <div className="flex-1 overflow-y-auto min-h-0">
+              {activeTab === 'create' && renderCreateTab()}
+              {activeTab === 'manage' && renderManageTab()}
+              {activeTab === 'export' && renderExportTab()}
+            </div>
           </div>
         ) : (
           <button
@@ -240,8 +247,7 @@ export const CustomNodeManager = ({ id, data, selected }) => {
               e.stopPropagation();
               updateNodeField(id, 'isDisplayOpen', true);
             }}
-            className="w-full text-center p-3 text-sm text-slate-400 hover:text-white bg-transparent border-0"
-            style={{ cursor: 'pointer' }}
+            className="w-full text-center p-3 text-sm text-slate-400 hover:text-white bg-transparent border-0 cursor-pointer"
           >
             Click to manage custom nodes
           </button>

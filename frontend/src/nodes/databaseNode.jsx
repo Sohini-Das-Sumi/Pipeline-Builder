@@ -133,10 +133,11 @@ export const DatabaseNode = ({ id, data, selected }) => {
               value={data?.query || ''}
               onChange={handleQueryChange}
               rows={2}
-              className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-vertical"
+              className="node-textarea-dark resize-vertical"
               placeholder="Enter SQL query"
               onClick={(e) => e.stopPropagation()}
             />
+
           </div>
           <button
             onClick={(e) => { e.stopPropagation(); handleExecuteQuery(); }}
@@ -153,10 +154,11 @@ export const DatabaseNode = ({ id, data, selected }) => {
                 value={filteredResults || data?.results || ''}
                 readOnly
                 rows={5}
-                className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-vertical"
+                className="node-textarea-dark resize-vertical"
                 placeholder="Query results will appear here"
                 onClick={(e) => e.stopPropagation()}
               />
+
             </div>
           )}
           {filterUI}

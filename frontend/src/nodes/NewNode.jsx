@@ -41,19 +41,7 @@ export const NewNode = ({ id, data, selected }) => {
     setContent(data?.content || '');
   }, [data?.content, id]);
 
-  const textareaStyle = {
-    marginLeft: 6,
-    width: '100%',
-    padding: '8px 12px',
-    boxSizing: 'border-box',
-    background: 'linear-gradient(45deg, #ffecd2, #fcb69f)',
-    border: 'none',
-    borderRadius: '8px',
-    color: '#333',
-    fontSize: '12px',
-    resize: 'vertical',
-    boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
-  };
+
 
   const handles = [
     { type: 'target', id: 'input' },
@@ -73,10 +61,11 @@ export const NewNode = ({ id, data, selected }) => {
             value={content}
             onChange={handleContentChange}
             placeholder="Enter your content here..."
-            className="node-textarea-style"
+            className="node-textarea-dark resize-vertical"
             rows={4}
             onClick={(e) => e.stopPropagation()}
           />
+
         </label>
         {filterUI}
       </div>

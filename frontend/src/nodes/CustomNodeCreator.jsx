@@ -173,13 +173,13 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-slate-800 rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-white">Create Custom Node</h2>
+    <div className="absolute inset-0 z-50 flex items-center justify-center p-4 overflow-hidden pointer-events-none">
+      <div className="bg-slate-800 rounded-lg p-6 w-full max-w-[600px] max-h-[330px] overflow-y-auto shadow-2xl border border-slate-600 pointer-events-auto">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-white">Create Custom Node</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-700 border border-slate-500 flex items-center justify-center hover:bg-slate-600 transition-colors text-white"
+            className="w-7 h-7 rounded-full bg-slate-700 border border-slate-500 flex items-center justify-center hover:bg-slate-600 transition-colors text-white text-sm"
           >
             ×
           </button>
@@ -187,19 +187,18 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Basic Configuration */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white mb-3">Basic Configuration</h3>
-
+          <div className="space-y-3">
+            <h3 className="text-base font-semibold text-white mb-2">Basic Configuration</h3>
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1">Node ID *</label>
               <input
                 type="text"
                 value={nodeConfig.id}
                 onChange={(e) => handleConfigChange('id', e.target.value)}
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-1.5 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
                 placeholder="unique-node-id"
               />
-              <p className="text-xs text-slate-400 mt-1">Unique identifier for the node type</p>
+              <p className="text-xs text-slate-400 mt-0.5">Unique identifier for the node type</p>
             </div>
 
             <div>
@@ -208,10 +207,10 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
                 type="text"
                 value={nodeConfig.title}
                 onChange={(e) => handleConfigChange('title', e.target.value)}
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-1.5 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
                 placeholder="My Custom Node"
               />
-              <p className="text-xs text-slate-400 mt-1">Display name shown on the node</p>
+              <p className="text-xs text-slate-400 mt-0.5">Display name shown on the node</p>
             </div>
 
             <div>
@@ -219,11 +218,11 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
               <textarea
                 value={nodeConfig.description}
                 onChange={(e) => handleConfigChange('description', e.target.value)}
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                className="w-full px-3 py-1.5 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none text-sm"
                 placeholder="Short description shown in the node panel"
                 rows={2}
               />
-              <p className="text-xs text-slate-400 mt-1">Optional description for the node</p>
+              <p className="text-xs text-slate-400 mt-0.5">Optional description for the node</p>
             </div>
 
             <div>
@@ -233,7 +232,7 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
                   <button
                     key={color.value}
                     onClick={() => handleConfigChange('color', color.value)}
-                    className={`w-8 h-8 rounded-full border-2 transition-all ${
+                    className={`w-8 h-8 rounded-full border-2 transition-all color-picker-button ${
                       nodeConfig.color === color.value ? 'border-white scale-110' : 'border-slate-600'
                     }`}
                     style={{ backgroundColor: color.value }}
@@ -243,7 +242,7 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-1">Input Handles</label>
                 <input
@@ -252,7 +251,7 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
                   max="10"
                   value={nodeConfig.inputs}
                   onChange={(e) => handleConfigChange('inputs', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
                 />
               </div>
               <div>
@@ -263,24 +262,23 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
                   max="10"
                   value={nodeConfig.outputs}
                   onChange={(e) => handleConfigChange('outputs', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
                 />
               </div>
             </div>
           </div>
 
           {/* Field Configuration */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white mb-3">Configuration Fields</h3>
-
-            <div className="space-y-3">
+          <div className="space-y-3">
+            <h3 className="text-base font-semibold text-white mb-2">Configuration Fields</h3>
+            <div className="space-y-2">
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-1">Field Name *</label>
                 <input
                   type="text"
                   value={currentField.name}
                   onChange={(e) => handleFieldChange('name', e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
                   placeholder="fieldName"
                 />
               </div>
@@ -291,7 +289,7 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
                   type="text"
                   value={currentField.label}
                   onChange={(e) => handleFieldChange('label', e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
                   placeholder="Field Label"
                 />
               </div>
@@ -312,7 +310,7 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
                     type="text"
                     value={currentField.helpText}
                     onChange={(e) => handleFieldChange('helpText', e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
                     placeholder="A short hint shown under the field"
                   />
                 </div>
@@ -324,7 +322,7 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
                   type="text"
                   value={currentField.validationRegex}
                   onChange={(e) => handleFieldChange('validationRegex', e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
                   placeholder="e.g. ^[A-Za-z0-9_]+$"
                 />
               </div>
@@ -336,7 +334,7 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
                     type="text"
                     value={currentField.visibleWhenField}
                     onChange={(e) => handleFieldChange('visibleWhenField', e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
                     placeholder="otherFieldName"
                   />
                 </div>
@@ -346,7 +344,7 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
                     type="text"
                     value={currentField.visibleWhenValue}
                     onChange={(e) => handleFieldChange('visibleWhenValue', e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
                     placeholder="value to match"
                   />
                 </div>
@@ -357,7 +355,7 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
                 <select
                   value={currentField.type}
                   onChange={(e) => handleFieldChange('type', e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
                 >
                   <option value="text">Text Input</option>
                   <option value="textarea">Text Area</option>
@@ -372,7 +370,7 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
                   type="text"
                   value={currentField.defaultValue}
                   onChange={(e) => handleFieldChange('defaultValue', e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
                   placeholder="Default value"
                 />
               </div>
@@ -383,7 +381,7 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
                   type="text"
                   value={currentField.placeholder}
                   onChange={(e) => handleFieldChange('placeholder', e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
                   placeholder="Placeholder text"
                 />
               </div>
@@ -430,7 +428,7 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
                     max="10"
                     value={currentField.rows}
                     onChange={(e) => handleFieldChange('rows', parseInt(e.target.value) || 3)}
-                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
                   />
                 </div>
               )}
@@ -473,7 +471,7 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
 
               <button
                 onClick={addField}
-                className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
+                className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm"
               >
                 Add Field
               </button>
@@ -481,16 +479,15 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
           </div>
 
           {/* Preview Section */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white mb-3">Preview</h3>
-            
+          <div className="space-y-3">
+            <h3 className="text-base font-semibold text-white mb-2">Preview</h3>
             {/* Node Preview */}
             <div className="bg-slate-900 p-4 rounded-lg">
               <div className="flex flex-col items-center">
                 {/* Node Card */}
                 <div 
-                  className="w-48 rounded-lg shadow-lg overflow-hidden"
-                  style={{ backgroundColor: nodeConfig.color || '#f97316' }}
+                  className="w-48 rounded-lg shadow-lg overflow-hidden node-color-bg"
+                  style={{ '--node-color': nodeConfig.color || '#f97316' }}
                 >
                   {/* Node Header */}
                   <div className="px-3 py-2 bg-black bg-opacity-20">
@@ -498,13 +495,11 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
                       {nodeConfig.title || 'Node Title'}
                     </div>
                   </div>
-                  
                   {/* Node Body */}
                   <div className="p-3 space-y-2 bg-slate-800">
                     {nodeConfig.description && (
                       <p className="text-slate-300 text-xs">{nodeConfig.description}</p>
                     )}
-                    
                     {/* Field Previews */}
                     {nodeConfig.fields.length === 0 ? (
                       <p className="text-slate-500 text-xs italic">No fields configured</p>
@@ -560,7 +555,6 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
                     )}
                   </div>
                 </div>
-
                 {/* Handles Preview */}
                 <div className="flex justify-between w-full mt-2 px-4">
                   {/* Input Handles */}
@@ -573,7 +567,6 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
                       />
                     ))}
                   </div>
-                  
                   {/* Output Handles */}
                   <div className="flex gap-1">
                     {Array.from({ length: Math.max(0, nodeConfig.outputs) }).map((_, i) => (
@@ -614,17 +607,17 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
         </div>
 
         {/* Current Fields List */}
-        <div className="mt-6">
-          <h3 className="text-lg font-semibold text-white mb-3">Current Fields</h3>
+        <div className="mt-4">
+          <h3 className="text-base font-semibold text-white mb-2">Current Fields</h3>
           {nodeConfig.fields.length === 0 ? (
-            <p className="text-slate-400">No fields added yet</p>
+            <p className="text-slate-400 text-sm">No fields added yet</p>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2 max-h-[120px] overflow-y-auto">
               {nodeConfig.fields.map((field, index) => (
-                <div key={index} className="flex items-center justify-between bg-slate-700 p-3 rounded">
+                <div key={index} className="flex items-center justify-between bg-slate-700 p-2 rounded">
                   <div>
-                    <span className="text-white font-medium">{field.label}</span>
-                    <span className="text-slate-400 text-sm ml-2">({field.type})</span>
+                    <span className="text-white font-medium text-sm">{field.label}</span>
+                    <span className="text-slate-400 text-xs ml-2">({field.type})</span>
                   </div>
                   <button
                     onClick={() => removeField(index)}
@@ -639,23 +632,21 @@ export const CustomNodeCreator = ({ onNodeCreated, onClose }) => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-end gap-4 mt-6">
+        <div className="flex justify-end gap-3 mt-4">
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded"
+            className="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded text-sm"
           >
             Cancel
           </button>
           <button
             onClick={createNode}
-            className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded"
+            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-sm"
           >
             Create Node
           </button>
         </div>
-
       </div>
     </div>
   );
-
 };

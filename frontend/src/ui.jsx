@@ -15,7 +15,8 @@ import { DatabaseNode } from './nodes/databaseNode.jsx';
 import { ImageNode } from './nodes/imageNode.jsx';
 import { CustomNodeManager } from './nodes/CustomNodeManager.jsx';
 import { TimerNode } from './nodes/timerNode.jsx';
-import { getCustomNodeComponent } from './nodes/CustomNodeLibrary.jsx';
+import { getCustomNodeComponent, getCustomNodes, getCustomNodeDefaultData } from './nodes/CustomNodeLibrary.jsx';
+
 import { PipelineToolbar } from './toolbar';
 
 import 'reactflow/dist/style.css';
@@ -91,8 +92,21 @@ export const PipelineUI = () => {
 
     const getInitNodeData = (nodeID, type) => {
       let nodeData = { id: nodeID, nodeType: `${type}` };
+      
+      // For custom nodes, merge default data from the custom node registry
+      const customNodeComponent = getCustomNodeComponent(type);
+      if (customNodeComponent) {
+        const customNodes = getCustomNodes();
+        const customNodeConfig = customNodes.find(node => node.id === type);
+        if (customNodeConfig) {
+          const defaultData = getCustomNodeDefaultData(customNodeConfig);
+          nodeData = { ...nodeData, ...defaultData };
+        }
+      }
+      
       return nodeData;
     }
+
 
     const onDrop = useCallback(
         (event) => {

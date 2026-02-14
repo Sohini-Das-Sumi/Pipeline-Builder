@@ -106,10 +106,11 @@ export const InputNode = ({ id, data, selected }) => {
               type="text"
               value={currName}
               onChange={handleNameChange}
-              className="w-full px-2 py-1 node-input-style rounded text-xs"
+              className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
               placeholder="Enter input name"
               onClick={(e) => e.stopPropagation()}
             />
+
           </div>
           <div>
             <label htmlFor={`${id}-inputType`} className="block text-xs font-medium node-label mb-1">Input Type</label>
@@ -117,9 +118,10 @@ export const InputNode = ({ id, data, selected }) => {
               id={`${id}-inputType`}
               value={inputType}
               onChange={handleTypeChange}
-              className="w-full px-2 py-1 node-select-style rounded text-xs"
+              className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
               onClick={(e) => e.stopPropagation()}
             >
+
               <option value="Text">Text</option>
               <option value="File">File</option>
               <option value="PDF">PDF</option>
@@ -210,10 +212,11 @@ export const InputNode = ({ id, data, selected }) => {
                 value={inputValue}
                 onChange={handleValueChange}
                 rows={3}
-                className="w-full px-2 py-1 node-input-style rounded text-xs resize-vertical"
+                className="node-textarea-dark resize-vertical"
                 placeholder="Enter input value"
                 onClick={(e) => e.stopPropagation()}
               />
+
             )}
           </div>
           {filterUI}

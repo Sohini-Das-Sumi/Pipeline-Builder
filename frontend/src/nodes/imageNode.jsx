@@ -194,14 +194,14 @@ export const ImageNode = ({ id, data, selected }) => {
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1">Recognition Result</label>
             <textarea
-              //className="resize-vertical"
               value={recognitionResult || data?.recognitionResult || ''}
               readOnly
               rows={4}
-              className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+              className="node-textarea-dark resize-vertical"
               placeholder={data?.imageUrl ? "Click 'Recognize Text' to extract text from the image" : "Enter an image URL above to enable text recognition"}
               onClick={(e) => e.stopPropagation()}
             />
+
           </div>
         </div>
       ) : (

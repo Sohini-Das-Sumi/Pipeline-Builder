@@ -50,10 +50,11 @@ export const NoteNode = ({ id, data, selected }) => {
               value={data?.note || ''}
               onChange={(e) => updateNodeField(id, 'note', e.target.value)}
               rows={3}
-              className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-vertical"
+              className="node-textarea-dark resize-vertical"
               placeholder="Enter your note"
               onClick={(e) => e.stopPropagation()}
             />
+
           </div>
         </div>
       ) : (

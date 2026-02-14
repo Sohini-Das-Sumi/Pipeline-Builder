@@ -145,10 +145,11 @@ export const createCustomNode = (nodeConfig) => {
                   value={fieldValue}
                   onChange={(e) => onChangeAndValidate(field, e.target.value)}
                   rows={field.rows || 3}
-                  className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                  className="node-textarea-dark resize-vertical"
                   placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}`}
                   onClick={(e) => e.stopPropagation()}
                 />
+
                 {field.helpText && <div className="text-xs text-slate-400 mt-1">{field.helpText}</div>}
                 {errors[field.name] && <div className="text-xs text-red-400 mt-1">{errors[field.name]}</div>}
               </div>
@@ -232,16 +233,16 @@ export const createCustomNode = (nodeConfig) => {
           </div>
         ) : (
           <button
-            className="node-closed-text"
+            className="node-closed-text cursor-pointer color-picker-button"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               updateNodeField(id, 'isDisplayOpen', true);
             }}
-            style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', fontSize: 'inherit' }}
           >
             Click to configure
           </button>
+
         )}
       </BaseNode>
     );
@@ -283,9 +284,10 @@ export const getCustomNodeDefaultData = (nodeConfig) => {
   // Add default values for fields
   if (nodeConfig.fields) {
     nodeConfig.fields.forEach(field => {
-      defaultData[field.name] = field.defaultValue || '';
+      defaultData[field.name] = field.defaultValue !== undefined ? field.defaultValue : '';
     });
   }
+
 
   return defaultData;
 };
