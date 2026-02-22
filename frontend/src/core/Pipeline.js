@@ -164,7 +164,7 @@ export class Pipeline {
               if (incomingEdges.length > 0) {
                 const sourceNode = this.nodes.find(n => n.id === incomingEdges[0].source);
                 if (sourceNode) {
-                  sourceType = sourceNode.type || sourceNode.data?.nodeType || 'Unknown';
+                  sourceType = sourceNode.type || (sourceNode.data && sourceNode.data.nodeType) || 'Unknown';
                 }
               }
             }
@@ -188,11 +188,54 @@ export class Pipeline {
       }
     }
 
-    // If we couldn't process all nodes (circular deps), mark remaining nodes with an error
+    // If we couldn't process all nodes, analyze why each unprocessed node failed
     if (processed.size < this.nodes.length) {
       for (const node of this.nodes) {
         if (!processed.has(node.id)) {
-          const errMsg = 'Error: Circular dependency or missing inputs';
+          const inc = incoming.get(node.id) || [];
+          
+          // Analyze why this node wasn't processed
+          let isCircularDependency = false;
+          let missingSourceNodes = [];
+          
+          for (const edge of inc) {
+            const sourceExists = nodeById.has(edge.source);
+            const sourceProcessed = processed.has(edge.source);
+            
+            if (!sourceExists) {
+              // Source node doesn't exist - it's a missing input issue
+              missingSourceNodes.push({
+                edgeId: edge.id,
+                sourceId: edge.source,
+                targetHandle: edge.targetHandle,
+                targetNodeId: edge.target
+              });
+            } else if (!sourceProcessed && missingSourceNodes.length === 0) {
+              // Source exists but wasn't processed - could be part of a cycle
+              isCircularDependency = true;
+            }
+          }
+
+          // Generate specific error message based on analysis
+          let errMsg;
+          if (missingSourceNodes.length > 0 && !isCircularDependency) {
+            // All sources are missing - definitely not a circular dependency  
+            const sourcesList = missingSourceNodes.map(m => m.sourceId).join(', ');
+            errMsg = `Error: Missing input source(s): node "${sourcesList}" not found in pipeline`;
+          } else if (isCircularDependency && missingSourceNodes.length === 0) {
+            // All sources exist but form a cycle - definite circular dependency
+            const sourcesList = inc.map(e => e.source).join(', ');
+            errMsg = `Error: Circular dependency detected - node "${node.id}" depends on unprocessed node(s): "${sourcesList}". Check your pipeline for circular connections.`;
+          } else if (missingSourceNodes.length > 0 && isCircularDependency) {
+            // Mixed case - report both issues
+            const missingList = missingSourceNodes.map(m => m.sourceId).join(', ');
+            const unprocessedList = inc.filter(e => processed.has(e.source) === false && !missingSourceNodes.some(m => m.sourceId === e.source)).map(e => e.source).join(', ');
+            errMsg = `Error: Pipeline issues detected - Missing: "${missingList}". Unprocessed (possible cycle): "${unprocessedList}".`;
+          } else {
+            // Default fallback
+            errMsg = 'Error: Node could not be processed - check pipeline connections';
+          }
+          
           outputsByNode.set(node.id, { output: errMsg });
           results.push({ nodeId: node.id, output: errMsg });
         }
