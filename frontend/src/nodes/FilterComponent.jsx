@@ -89,11 +89,11 @@ export const useFilterComponent = ({ id, data, updateNodeField }) => {
 
         {isFilterEnabled && (
           <>
-            <label className="text-[10px] text-slate-400 font-bold">FILTER TYPE</label>
+            <label className="text-[10px] text-slate-600 font-bold">FILTER TYPE</label>
             <select
               value={filterType}
               onChange={handleTypeChange}
-              className="w-full bg-slate-50 border border-slate-200 rounded-md p-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full bg-white border border-slate-300 rounded-md p-2 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none"
             >
               <option value="none">No Filter</option>
               <option value="contains">Contains</option>
@@ -104,12 +104,12 @@ export const useFilterComponent = ({ id, data, updateNodeField }) => {
               <option value="lessThan">Less Than</option>
               <option value="regex">Regex Match</option>
             </select>
-            <label className="text-[10px] text-slate-400 font-bold">FILTER VALUE</label>
+            <label className="text-[10px] text-slate-600 font-bold">FILTER VALUE</label>
             <input
               type="text"
               value={filterValue}
               onChange={handleValueChange}
-              className="w-full bg-slate-50 border border-slate-200 rounded-md p-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full bg-white border border-slate-300 rounded-md p-2 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none"
               placeholder="Enter filter value..."
             />
           </>

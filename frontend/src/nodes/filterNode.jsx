@@ -11,6 +11,9 @@ export const FilterNode = ({ id, data, selected }) => {
   const selectedNodesStore = useStore((state) => state.selectedNodes);
   const isSelected = selected || (selectedNodesStore || []).includes(id);
   
+  // Use local state for output to ensure it displays correctly
+  const [output, setOutput] = useState(data?.output || '');
+  
   // Sync isDisplayOpen with selected state - this ensures arrangeDisplays can find the node
   // when it's selected (which is one way to open the filter display)
   const isDisplayOpen = data?.isDisplayOpen || selected;
@@ -22,11 +25,21 @@ export const FilterNode = ({ id, data, selected }) => {
     }
   }, [selected, data?.isDisplayOpen, id, updateNodeField]);
 
+  // Sync output with store data - this ensures the output displays after pipeline execution
+  useEffect(() => {
+    if (data?.output !== undefined && data?.output !== output) {
+      setOutput(data.output);
+    }
+  }, [data?.output]);
+
   const { filterUI, applyFilter } = useFilterComponent({
     id,
     data,
     updateNodeField
   });
+
+  // Apply filter to output if it exists (for display in the UI)
+  const filteredOutput = output ? applyFilter(output) : '';
 
   const handles = [
     { type: 'target', id: 'input' },
@@ -65,6 +78,19 @@ export const FilterNode = ({ id, data, selected }) => {
             >
               ×
             </button>
+          </div>
+          {/* Output Area - This displays the filter result after pipeline execution */}
+          <div>
+            <label htmlFor={`${id}-output`} className="block text-xs font-medium text-slate-300 mb-1">Output</label>
+            <textarea
+              id={`${id}-output`}
+              readOnly
+              rows={3}
+              value={filteredOutput || output}
+              className="node-textarea-dark resize-vertical"
+              placeholder="Filtered output will appear here"
+              onClick={(e) => e.stopPropagation()}
+            />
           </div>
           {filterUI}
         </div>

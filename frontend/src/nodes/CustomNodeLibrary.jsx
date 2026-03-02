@@ -31,40 +31,64 @@ export const createCustomNode = (nodeConfig) => {
       }
     }
 
+    // Use ref to track previous result to prevent unnecessary updates
+    const prevResultRef = React.useRef(data?.result);
+    
+    // Keep ref in sync with data.result
+    React.useEffect(() => {
+      prevResultRef.current = data?.result;
+    }, [data?.result]);
+    
     // Handle field changes
     const handleFieldChange = (fieldName, value) => {
+      // Calculator logic: compute result directly when num1 or num2 changes
+      if (nodeConfig.id === 'calculator' && (fieldName === 'num1' || fieldName === 'num2')) {
+        // Skip if the value hasn't actually changed from what's stored
+        const currentStoredValue = data?.[fieldName];
+        if (value === currentStoredValue) {
+          return; // No actual change, skip
+        }
+        
+        // Get the new value and the other field's current value
+        const num1 = fieldName === 'num1' ? parseFloat(value) : parseFloat(data?.num1);
+        const num2 = fieldName === 'num2' ? parseFloat(value) : parseFloat(data?.num2);
+        
+        // Only calculate if both inputs are valid numbers
+        if (!isNaN(num1) && !isNaN(num2)) {
+          const operation = data?.operation ?? 'add';
+          let result = 0;
+          
+          switch (operation) {
+            case 'add':
+              result = num1 + num2;
+              break;
+            case 'subtract':
+              result = num1 - num2;
+              break;
+            case 'multiply':
+              result = num1 * num2;
+              break;
+            case 'divide':
+              result = num2 !== 0 ? num1 / num2 : 0;
+              break;
+            default:
+              result = 0;
+          }
+          
+          // Only update if result actually changed
+          if (result !== prevResultRef.current) {
+            prevResultRef.current = result;
+            // Update both the field and result together
+            updateNodeField(id, fieldName, value);
+            updateNodeField(id, 'result', result);
+            return; // Early return - we already updated both fields
+          }
+        }
+      }
+      
+      // Default handling for other fields
       updateNodeField(id, fieldName, value);
     };
-
-    // Calculator logic: automatically compute result when inputs change
-    React.useEffect(() => {
-      if (nodeConfig.id === 'calculator') {
-        const num1 = parseFloat(data?.num1 ?? 0);
-        const num2 = parseFloat(data?.num2 ?? 0);
-        const operation = data?.operation ?? 'add';
-
-        let result = 0;
-        switch (operation) {
-          case 'add':
-            result = num1 + num2;
-            break;
-          case 'subtract':
-            result = num1 - num2;
-            break;
-          case 'multiply':
-            result = num1 * num2;
-            break;
-          case 'divide':
-            result = num2 !== 0 ? num1 / num2 : 0; // Avoid division by zero
-            break;
-          default:
-            result = 0;
-        }
-
-        // Update result field
-        updateNodeField(id, 'result', result);
-      }
-    }, [data?.num1, data?.num2, data?.operation, id, nodeConfig.id, updateNodeField]);
 
     // local validation state for this node instance
     const [errors, setErrors] = React.useState({});
@@ -185,12 +209,21 @@ export const createCustomNode = (nodeConfig) => {
                 </label>
                 <input
                   id={fieldId}
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9.-]*"
                   value={fieldValue}
-                  onChange={(e) => onChangeAndValidate(field, parseFloat(e.target.value) || 0)}
-                  min={field.min}
-                  max={field.max}
-                  step={field.step || 1}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Allow empty, numbers, decimal point, and minus sign
+                    if (value === '' || /^-?\d*\.?\d*$/.test(value)) {
+                      onChangeAndValidate(field, value);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    // Stop propagation for all keys to prevent ReactFlow interference
+                    e.stopPropagation();
+                  }}
                   className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}`}
                   onClick={(e) => e.stopPropagation()}

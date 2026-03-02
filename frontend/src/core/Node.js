@@ -208,8 +208,14 @@ export class OutputNode extends Node {
 
 export class FilterNode extends Node {
   async execute(inputs = {}) {
-    const inputData = inputs.inputData || '';
-    const { filterType, filterValue } = this.data;
+    const inputData = inputs.inputData || inputs.output || inputs.inputValue || '';
+    const { filterType, filterValue, isFilterEnabled } = this.data;
+
+    // If filter is not enabled or filter type is 'none', pass through the input data
+    if (!isFilterEnabled || filterType === 'none' || !inputData) {
+      this.updateField('output', inputData);
+      return { output: inputData };
+    }
 
     let filteredOutput = '';
 
