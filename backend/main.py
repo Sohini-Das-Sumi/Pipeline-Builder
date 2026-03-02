@@ -146,10 +146,21 @@ def get_stored_pipelines():
 def is_dag(nodes, edges):
     # Build adjacency list
     graph = defaultdict(list)
+    # Get all valid node IDs
+    node_ids = {node['id'] for node in nodes}
+    # Initialize in_degree only for valid nodes
     in_degree = {node['id']: 0 for node in nodes}
+    
     for edge in edges:
-        graph[edge['source']].append(edge['target'])
-        in_degree[edge['target']] += 1
+        source = edge.get('source')
+        target = edge.get('target')
+        
+        # Skip edges where source or target is not a valid node
+        if source not in node_ids or target not in node_ids:
+            continue
+            
+        graph[source].append(target)
+        in_degree[target] += 1
 
     # Kahn's algorithm for topological sort
     queue = deque([node for node in in_degree if in_degree[node] == 0])
@@ -306,16 +317,34 @@ async def query_database(request: DatabaseRequest):
         # Execute query
         with engine.connect() as conn:
             result = conn.execute(text(request.query))
-            columns = result.keys()
-            rows = result.fetchall()
-
-            # Convert to list of dicts
-            data = [dict(zip(columns, row)) for row in rows]
+            
+            # Check if the query modifies data (not a SELECT)
+            query_upper = request.query.strip().upper()
+            is_select = query_upper.startswith('SELECT')
+            
+            # For SELECT queries, fetch the results BEFORE commit
+            # For INSERT/UPDATE/DELETE, get rowcount BEFORE commit
+            if is_select:
+                # Fetch data before anything else
+                if not result.closed:
+                    columns = result.keys()
+                    rows = result.fetchall()
+                    data = [dict(zip(columns, row)) for row in rows]
+                else:
+                    data = []
+                # No commit needed for SELECT
+            else:
+                # For INSERT/UPDATE/DELETE, get rowcount before commit
+                rows_affected = result.rowcount
+                # Commit changes
+                conn.commit()
+                # Return success message
+                data = [{"status": "success", "rows_affected": rows_affected}]
 
         return {
             "data": data,
-            "columns": list(columns),
-            "row_count": len(data),
+            "columns": list(columns) if is_select and 'columns' in dir() else [],
+            "row_count": len(data) if isinstance(data, list) else 1,
             "query": request.query
         }
     except Exception as e:

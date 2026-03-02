@@ -19,7 +19,8 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: black;
+  /* Force dark background by default - ensures UI is visible even if theme doesn't load */
+  background-color: #000000 !important;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -31,6 +32,8 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  /* Force dark background */
+  background-color: #000000 !important;
 }
 
 code {

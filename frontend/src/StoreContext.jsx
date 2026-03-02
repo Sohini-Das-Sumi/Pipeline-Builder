@@ -50,7 +50,22 @@ export const StoreProvider = ({ children }) => {
   const [backgroundVisible, setBackgroundVisible] = useState(true);
   const [hasExploded, setHasExploded] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [theme, setTheme] = useState('dark');
+  // Force dark theme by default - this ensures the UI always starts with dark colors
+  // localStorage will be read but if nothing is saved, dark theme will be used
+  const getInitialTheme = () => {
+    try {
+      const savedState = localStorage.getItem('pipelineState');
+      if (savedState) {
+        const parsedState = JSON.parse(savedState);
+        return parsedState.theme || 'dark';
+      }
+    } catch (e) {
+      // Ignore localStorage errors
+    }
+    return 'dark';
+  };
+  
+  const [theme, setTheme] = useState(getInitialTheme);
   const [isInteractive, setIsInteractive] = useState(true);
   const [zoomOnScroll, setZoomOnScroll] = useState(true);
   const [zoomOnPinch, setZoomOnPinch] = useState(true);
