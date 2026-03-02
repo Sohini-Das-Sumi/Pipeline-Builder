@@ -75,11 +75,10 @@ export const TextNode = ({ id, data, selected }) => {
   }, [variables]);
 
   // Combine base handles with variable handles
-  // Base handles: input (target), output (source), filter (target on top)
+  // Base handles: output (source), filter (target on top)
   // Variable handles: dynamically created target handles on the left for each {{variable}}
   const handles = useMemo(() => {
     const baseHandles = [
-      { type: 'target', id: 'input' },
       { type: 'source', id: 'output' },
       { type: 'target', id: 'filter', position: Position.Top }
     ];

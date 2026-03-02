@@ -33,6 +33,19 @@ export class Pipeline {
 
   // Add an edge to the pipeline
   addEdge(edge) {
+    // Check for duplicate edges - compare source, target, and handles
+    const isDuplicate = this.edges.some(existingEdge => 
+      existingEdge.source === edge.source && 
+      existingEdge.target === edge.target &&
+      existingEdge.sourceHandle === edge.sourceHandle &&
+      existingEdge.targetHandle === edge.targetHandle
+    );
+    
+    if (isDuplicate) {
+      console.warn('Duplicate edge detected, skipping:', edge);
+      return;
+    }
+    
     this.edges.push(edge);
   }
 
@@ -139,6 +152,10 @@ export class Pipeline {
               // For CalculatorNode (input-1)
               if (inputKey !== 'input-1') {
                 inputs['input-1'] = srcVal;
+              }
+              // For TextNode variable handles (var-{variableName})
+              if (inputKey.startsWith('var-')) {
+                inputs[inputKey] = srcVal;
               }
             }
           } else {

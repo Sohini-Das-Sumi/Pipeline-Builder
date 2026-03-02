@@ -268,9 +268,60 @@ export class ImageNode extends ApiNode {
   }
 }
 
+// Helper function to parse variables from text content
+const parseVariablesFromText = (text) => {
+  if (!text) return [];
+  const regex = /\{\{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\}\}/g;
+  const variables = [];
+  let match;
+  while ((match = regex.exec(text)) !== null) {
+    const varName = match[1];
+    if (!variables.includes(varName)) {
+      variables.push(varName);
+    }
+  }
+  return variables;
+};
+
 export class TextNode extends Node {
   async execute(inputs = {}) {
-    let output = this.data.text;
+    let output = this.data.text || '';
+    
+    // Get variables from node data, OR parse from text if not available
+    let variables = this.data.variables || [];
+    if (variables.length === 0 && output) {
+      variables = parseVariablesFromText(output);
+    }
+    
+    if (variables.length > 0) {
+      // For each variable, replace {{variableName}} with the input value
+      for (const varName of variables) {
+        // First, try to get value from variable-specific handle (var-{variableName})
+        let varValue = inputs[`var-${varName}`];
+        
+        // If not found, try to get from main inputData (for connections to regular input handle)
+        if (varValue === undefined || varValue === null) {
+          varValue = inputs.inputData;
+        }
+        
+        // If still not found, try outputValue
+        if (varValue === undefined || varValue === null) {
+          varValue = inputs.outputValue;
+        }
+        
+        // Also try the raw inputValue (used by InputNode)
+        if (varValue === undefined || varValue === null) {
+          varValue = inputs.inputValue;
+        }
+        
+        if (varValue !== undefined && varValue !== null) {
+          const varPattern = new RegExp(`\\{\\{\\s*${varName}\\s*\\}\\}`, 'g');
+          output = output.replace(varPattern, String(varValue));
+        }
+      }
+    }
+    
+    // Apply filter if enabled
     if (this.data.isFilterEnabled && this.data.filterType !== 'none') {
       const operations = {
         contains: (data, filter) => data.includes(filter) ? data : '',
@@ -295,6 +346,7 @@ export class TextNode extends Node {
       };
       output = operations[this.data.filterType] ? operations[this.data.filterType](output, this.data.filterValue) : output;
     }
+    
     this.updateField('output', output);
     return { output };
   }

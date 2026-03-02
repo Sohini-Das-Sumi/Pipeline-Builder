@@ -182,6 +182,14 @@ export const StoreProvider = ({ children }) => {
 
   const executePipeline = useCallback(async (...args) => {
     console.log('Store executePipeline called with args:', args);
+    
+    // CRITICAL FIX: Sync current nodes from store to StateManager before execution
+    // This ensures the pipeline has the latest node data including newly added nodes
+    if (nodes && nodes.length > 0) {
+      console.log('Syncing nodes to StateManager before execution:', nodes.map(n => ({ id: n.id, type: n.type })));
+      getStateManager().syncFromStore(nodes);
+    }
+    
     const result = await getStateManager().executePipeline(...args);
     console.log('Store executePipeline result:', result);
 

@@ -100,6 +100,19 @@ export class StateManager {
   }
 
   onConnect(connection) {
+    // Check for duplicate edges before adding
+    const existingEdge = this.pipeline.edges.find(edge => 
+      edge.source === connection.source && 
+      edge.target === connection.target &&
+      edge.sourceHandle === connection.sourceHandle &&
+      edge.targetHandle === connection.targetHandle
+    );
+    
+    if (existingEdge) {
+      console.warn('Duplicate edge already exists, skipping:', connection);
+      return;
+    }
+    
     // Generate a unique edge ID if not provided
     const edgeId = connection.id || this.getEdgeID();
     const newEdge = {
@@ -240,6 +253,22 @@ export class StateManager {
     }
   }
 
+  // Helper function to deduplicate edges
+  deduplicateEdges(edges) {
+    const seenConnections = new Set();
+    const deduplicatedEdges = [];
+    for (const edge of edges) {
+      const connectionKey = `${edge.source}|${edge.target}|${edge.sourceHandle || 'null'}|${edge.targetHandle || 'null'}`;
+      if (!seenConnections.has(connectionKey)) {
+        seenConnections.add(connectionKey);
+        deduplicatedEdges.push(edge);
+      } else {
+        console.warn('Removing duplicate edge:', edge);
+      }
+    }
+    return deduplicatedEdges;
+  }
+
   // Recursive state loading
   loadFromStorage() {
     // NOTE: previously this code cleared localStorage on load which prevented
@@ -274,6 +303,9 @@ export class StateManager {
             !(edge.source === 'llm-1' && edge.target === 'customOutput-1')
           );
 
+          // Deduplicate edges - remove duplicate connections (same source, target, and handles)
+          const deduplicatedEdges = this.deduplicateEdges(filteredEdges);
+
           // Validate positions in loaded nodes to prevent NaN values
           const validatedNodes = loadedState.nodes.map(node => {
             const validatedNode = {
@@ -300,7 +332,7 @@ export class StateManager {
           });
           // Prevent all nodes from auto-attaching on page refresh - start with empty canvas
           const filteredNodes = [];
-          this.pipeline = new Pipeline(filteredNodes, filteredEdges);
+          this.pipeline = new Pipeline(filteredNodes, deduplicatedEdges);
           // Invalidate caches to ensure fresh data
           this.lastNodesHash = null;
           this.lastEdgesHash = null;
