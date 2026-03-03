@@ -1,6 +1,6 @@
-
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { StateManager } from './core/StateManager.js';
+import { resetNodeCounters } from './core/Node.js';
 import { MarkerType } from 'reactflow';
 
 // Create the context
@@ -135,6 +135,10 @@ export const StoreProvider = ({ children }) => {
       const savedState = localStorage.getItem('pipelineState');
       if (savedState) {
         const parsedState = JSON.parse(savedState);
+        
+        // Reset node counters to ensure sequential naming starts fresh for new nodes
+        resetNodeCounters();
+        
         console.log('Loading persisted state from localStorage:', parsedState);
         // Prevent all nodes from auto-attaching on page refresh - start with empty canvas
         const filteredNodes = [];
@@ -198,23 +202,16 @@ export const StoreProvider = ({ children }) => {
   const executePipeline = useCallback(async (...args) => {
     console.log('Store executePipeline called with args:', args);
     
-    // CRITICAL FIX: Sync current nodes from store to StateManager before execution
-    // This ensures the pipeline has the latest node data including newly added nodes
+    // Sync current nodes from store to StateManager before execution
     if (nodes && nodes.length > 0) {
       console.log('Syncing nodes to StateManager before execution:', nodes.map(n => ({ id: n.id, type: n.type })));
-      getStateManager().syncFromStore(nodes);
+      getStateManager().syncFromStore(nodes, edges);
     }
     
     const result = await getStateManager().executePipeline(...args);
     console.log('Store executePipeline result:', result);
 
-    // Sync updated node data from stateManager after execution
-    const updatedNodesFromStateManager = getStateManager().getNodes();
-
-    console.log('Store syncing nodes from stateManager after execution');
-    console.log('LLM node output from stateManager:', updatedNodesFromStateManager.find(n => n.id === 'llm-1')?.data?.output);
-
-    // Sync execution results back to stateManager first
+    // Sync execution results back to stateManager
     getStateManager().syncExecutionResults(result.outputs);
 
     // Get updated nodes from stateManager after syncing execution results
@@ -231,12 +228,11 @@ export const StoreProvider = ({ children }) => {
     // Use updated nodes from stateManager as base, preserve store-specific fields
     const syncedNodes = finalUpdatedNodes.map(updatedNode => {
       // Preserve existing isDisplayOpen state from current nodes in store
-      // Default to false if not found, except for LLM nodes which should show output
       const preservedIsDisplayOpen = currentDisplayStates.has(updatedNode.id) 
         ? currentDisplayStates.get(updatedNode.id)
         : (updatedNode.type === 'llm');
 
-      // Create completely new node object to force React re-render
+      // Create new node object for React re-render
       const newNode = {
         id: updatedNode.id,
         type: updatedNode.type,
@@ -247,7 +243,6 @@ export const StoreProvider = ({ children }) => {
           isDisplayOpen: preservedIsDisplayOpen,
           isVisible: true,
         },
-        // Ensure position is valid to prevent SVG path NaN errors
         position: {
           x: typeof updatedNode.position?.x === 'number' && !isNaN(updatedNode.position.x) && isFinite(updatedNode.position.x) ? updatedNode.position.x : 0,
           y: typeof updatedNode.position?.y === 'number' && !isNaN(updatedNode.position.y) && isFinite(updatedNode.position.y) ? updatedNode.position.y : 0,
@@ -258,14 +253,6 @@ export const StoreProvider = ({ children }) => {
 
     console.log('Setting nodes in store with syncedNodes:', syncedNodes.map(n => ({ id: n.id, output: n.data?.output?.substring(0, 50) + '...' })));
     setNodes(syncedNodes);
-    console.log('Store nodes after set:', syncedNodes.map(n => ({ id: n.id, output: n.data?.output?.substring(0, 50) + '...' })));
-    console.log('LLM node output after set:', syncedNodes.find(n => n.id === 'llm-1')?.data?.output);
-    console.log('LLM node output from syncedNodes:', syncedNodes.find(n => n.id === 'llm-1')?.data?.output);
-
-    // Removed auto-selection of output node after execution to prevent automatic display opening
-
-    // Sync stateManager's pipeline nodeMap with the updated nodes
-    getStateManager().syncFromStore(syncedNodes);
 
     if (!result || !result.results) {
       return [];
@@ -725,7 +712,7 @@ export const StoreProvider = ({ children }) => {
         // Closing display
         const node = updatedNodes.find(n => n.id === nodeId);
         if (node.data.originalPosition) {
-          updatedNodes = updatedNodes.map(n => n.id === nodeId ? { ...n, position: { ...node.data.originalPosition }, data: { ...node.data, originalPosition: undefined } } : n);
+          updatedNodes = updatedNodes.map(n => n.id === nodeId ? { ...n, position: { ...node.data.originalPosition }, data: { ...n.data, originalPosition: undefined } } : n);
         }
       }
       // Arrange all open displays
@@ -804,7 +791,7 @@ export const StoreProvider = ({ children }) => {
         console.error('openSelectedDisplays failed', e);
       }
     },
-persistState,
+    persistState,
     schedulePersist,
     setOnSelectionChangeCallback: setOnSelectionChangeCallbackFunc,
     updateCanvasBounds,

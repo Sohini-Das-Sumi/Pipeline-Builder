@@ -32,7 +32,13 @@ export const InputNode = ({ id, data, selected }) => {
   const handleNameChange = e => {
     const newName = e.target.value;
     setCurrName(newName);
-    updateNodeField(id, 'inputName', newName);
+    // Don't update store on every keystroke - only update on blur
+    // This prevents the cursor from jumping due to re-renders
+  };
+
+  const handleNameBlur = () => {
+    // Only update store when user leaves the field
+    updateNodeField(id, 'inputName', currName);
   };
 
   const handleTypeChange = e => {
@@ -81,7 +87,7 @@ export const InputNode = ({ id, data, selected }) => {
       updateNodeField={updateNodeField}
       selectNode={selectNode}
       className={`transition-transform duration-500`}
-      nodeKey={`${id}-${isDisplayOpen}`}
+      nodeKey={id}
       data={nodeData}
 
     >
@@ -106,6 +112,7 @@ export const InputNode = ({ id, data, selected }) => {
               type="text"
               value={currName}
               onChange={handleNameChange}
+              onBlur={handleNameBlur}
               className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
               placeholder="Enter input name"
               onClick={(e) => e.stopPropagation()}

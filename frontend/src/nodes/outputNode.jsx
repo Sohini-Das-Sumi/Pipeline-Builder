@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { Position } from 'reactflow';
 import { BaseNode } from './BaseNode';
-import { useStore } from '../store';
+import { useStore } from '../StoreContext.jsx';
 import { useFilterComponent } from './FilterComponent';
 
 
@@ -11,6 +11,7 @@ export const OutputNode = ({ id, data, selected }) => {
   const selectedNodesStore = useStore((state) => state.selectedNodes);
   const edges = useStore((state) => state.edges);
   const nodes = useStore((state) => state.nodes);
+  
   const isSelected = selected || (selectedNodesStore || []).includes(id);
 
   // Find the source node connected to this output node's "value" handle
@@ -34,12 +35,40 @@ export const OutputNode = ({ id, data, selected }) => {
   // Apply filter to output value if it exists
   const filteredOutput = data?.outputValue ? applyFilter(data.outputValue) : '';
 
-  // Removed auto-opening on selection - displays stay closed by default
+  // Generate default name based on node ID
+  const getDefaultName = () => {
+    const parts = id.split('-');
+    const num = parts.length > 1 ? parseInt(parts[parts.length - 1], 10) : 1;
+    return `output_${isNaN(num) ? 1 : num}`;
+  };
 
+  // Initialize local state from data or generate default
+  // Use useState with a function to avoid recalculating on every render
+  const [inputValue, setInputValue] = useState(() => {
+    const rawName = data?.outputName;
+    // Only use rawName if it's a valid user-set value
+    if (rawName && rawName !== '' && rawName !== 'output_') {
+      return rawName;
+    }
+    return getDefaultName();
+  });
 
+  // Handle name change - update local state immediately
   const handleNameChange = (e) => {
-    const newName = e.target.value;
+    setInputValue(e.target.value);
+  };
+
+  // Update store when user leaves the field or presses Enter
+  const handleBlur = () => {
+    const newName = inputValue.trim() || getDefaultName();
+    setInputValue(newName);
     updateNodeField(id, 'outputName', newName);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.target.blur();
+    }
   };
 
   const handles = [
@@ -54,7 +83,7 @@ export const OutputNode = ({ id, data, selected }) => {
   };
 
   return (
-    <div key={`${id}-${data?._timestamp || ''}-${data?.output || data?.outputValue || ''}-${isDisplayOpen}`}>
+    <div key={`${id}-${isDisplayOpen}`}>
       <BaseNode
         id={id}
         title="Output"
@@ -75,8 +104,10 @@ export const OutputNode = ({ id, data, selected }) => {
             <input
               id={`${id}-outputName`}
               type="text"
-              value={data?.outputName || `output_${parseInt(id.split('-')[1], 10) || 1}`}
+              value={inputValue}
               onChange={handleNameChange}
+              onBlur={handleBlur}
+              onKeyDown={handleKeyDown}
               className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
               placeholder="Enter output name"
               onClick={(e) => e.stopPropagation()}
@@ -126,4 +157,4 @@ export const OutputNode = ({ id, data, selected }) => {
     </BaseNode>
     </div>
   );
-}
+};

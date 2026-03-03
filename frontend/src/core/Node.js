@@ -1,5 +1,8 @@
 // core/Node.js - Simplified Node class hierarchy with reduced duplication
 
+// Global counters for sequential naming
+let outputNodeCounter = 0;
+
 // Helper function to validate and sanitize position coordinates
 const validatePosition = (position) => {
   if (!position || typeof position !== 'object') {
@@ -202,7 +205,7 @@ export class OutputNode extends Node {
   async execute(inputs = {}) {
     const outputValue = inputs.inputData || inputs.outputValue || this.data.outputValue || '';
     this.updateField('output', outputValue);
-    return { outputValue };
+    return { output: outputValue, outputValue };
   }
 }
 
@@ -579,7 +582,7 @@ export class NodeFactory {
     },
     'customOutput': {
       class: OutputNode,
-      defaults: { outputName: 'output_', outputType: 'Text', outputValue: '', isVisible: true }
+      defaults: { outputName: '', outputType: 'Text', outputValue: '', isVisible: true }
     },
     'filter': {
       class: FilterNode,
@@ -618,12 +621,19 @@ export class NodeFactory {
     if (config) {
       // Merge defaults with provided data
       const mergedData = { ...config.defaults, ...data };
-      // Apply naming patterns recursively
-      if (typeStr.includes('Output')) {
-        mergedData.outputName = 'output_' + (parseInt(idStr.split('-')[1], 10) || 1);
+      // Apply naming patterns only if outputName is not already set
+      // Use global counter for sequential output naming
+      if (typeStr.includes('Output') && !mergedData.outputName) {
+        outputNodeCounter++;
+        mergedData.outputName = 'output_' + outputNodeCounter;
       }
       return new config.class(idStr, typeStr, position, mergedData);
     }
     return new Node(idStr, typeStr, position, data);
   }
 }
+
+// Export counter for resetting (useful when loading from localStorage)
+export const resetNodeCounters = () => {
+  outputNodeCounter = 0;
+};

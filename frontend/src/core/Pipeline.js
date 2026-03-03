@@ -114,7 +114,15 @@ export class Pipeline {
               const srcOut = outputsByNode.get(edge.source) || {};
               // Prefer source.output, then outputValue, then inputValue
               const srcVal = srcOut.output !== undefined ? srcOut.output : (srcOut.outputValue !== undefined ? srcOut.outputValue : srcOut.inputValue);
-              const key = edge.targetHandle || edge.targetHandle === null ? edge.targetHandle : (edge.target || 'inputData');
+              
+              // Extract the actual handle ID from the full handle ID
+              // BaseNode creates handles with id={`${id}-${h.id}`}, so we need to extract the handle part
+              let targetHandleId = edge.targetHandle;
+              if (targetHandleId && targetHandleId.startsWith(edge.target + '-')) {
+                targetHandleId = targetHandleId.substring(edge.target.length + 1);
+              }
+              
+              const key = targetHandleId || targetHandleId === null ? targetHandleId : (edge.target || 'inputData');
               // If handle is falsy, default to 'inputData'
               const inputKey = key || 'inputData';
               

@@ -387,8 +387,9 @@ export class StateManager {
   }
 
   // Sync from store after execution to ensure pipeline nodeMap is updated with synced data
-  syncFromStore(storeNodes) {
+  syncFromStore(storeNodes, storeEdges = []) {
     this.pipeline.nodes = storeNodes.map(node => NodeFactory.createNode(node.type, node.id, node.position, node.data));
+    this.pipeline.edges = storeEdges;
     this.pipeline.buildNodeMap();
   }
 
@@ -410,7 +411,6 @@ export class StateManager {
         if (result.outputValue !== undefined) {
           node.updateField('outputValue', result.outputValue);
         }
-        node.updateField('_timestamp', Date.now());
       }
     });
   }
